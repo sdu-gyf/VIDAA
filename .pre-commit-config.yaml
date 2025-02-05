@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace  # remove trailing whitespace
+      - id: end-of-file-fixer     # ensure file ends with a blank line
+      - id: check-yaml            # check YAML format
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black  # format Python code
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v4.0.0-alpha.8"
+    hooks:
+      - id: prettier
+        types: [markdown, json, yaml, javascript, ts, tsx]
