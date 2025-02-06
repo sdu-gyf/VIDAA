@@ -15,4 +15,4 @@ repos:
     rev: "v4.0.0-alpha.8"
     hooks:
       - id: prettier
-        types: [markdown, json, yaml, javascript, ts, tsx]
+        types: [markdown, json, yaml, javascript, ts, tsx, python]
