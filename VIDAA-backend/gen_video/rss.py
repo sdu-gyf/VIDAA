@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncGenerator, Dict, Any, Type, List, Tuple
 from abc import ABC, abstractmethod
 from feedparser import parse
@@ -111,6 +110,7 @@ class PeoplePoliticsContent(BaseRSSContent):
 
 
 if __name__ == "__main__":
+    import asyncio
 
     async def main():
         sources = BaseRSSContent.get_all_sources()

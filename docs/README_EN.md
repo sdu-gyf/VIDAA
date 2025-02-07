@@ -27,7 +27,7 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
 ### Back-End Capabilities
 
 - **Video Generation**
-  - [ ] RSS feed fetching
+  - [x] RSS feed fetching
   - [ ] Topic analysis
   - [ ] Copywriting generation
   - [ ] Audio and subtitle file creation

@@ -2,3 +2,4 @@ VIDAA-backend/vidaa
 **/__pycache__/
 logs/
 .cursor_commit
+vidaa.db
