@@ -3,3 +3,5 @@ VIDAA-backend/vidaa
 logs/
 .cursor_commit
 vidaa.db
+node_modules/
+diff.txt

@@ -109,6 +109,13 @@ class PeoplePoliticsContent(BaseRSSContent):
         return entry
 
 
+def get_rss_sources():
+    return [
+        {"index": it[0] - 1, "name": it[1], "url": it[2]}
+        for it in BaseRSSContent.get_all_sources()
+    ]
+
+
 if __name__ == "__main__":
     import asyncio
 
