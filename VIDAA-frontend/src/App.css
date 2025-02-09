@@ -5,38 +5,45 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.message-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.message-card {
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.message-title {
+  margin: 0 0 8px 0;
 }
 
-.card {
-  padding: 2em;
+.message-link {
+  color: #1890ff;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
 }
 
-.read-the-docs {
-  color: #888;
+.message-content {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.toggle-expand {
+  color: #1890ff;
+  cursor: pointer;
+  margin-top: 8px;
+  text-align: right;
+  font-size: 13px;
+}
+
+.loading-more {
+  text-align: center;
+  padding: 10px;
 }

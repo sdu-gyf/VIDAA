@@ -72,7 +72,7 @@ function App() {
     <>
       <div>
         <h1>VIDAA</h1>
-        <div style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
+        <div className="message-container">
           {messages.length === 0 ? (
             <div>{loading ? 'loading...' : 'no message'}</div>
           ) : (
@@ -80,49 +80,29 @@ function App() {
               {messages.map((msg, index) => (
                 <div
                   key={index}
-                  style={{
-                    margin: '15px 0',
-                    padding: '10px',
-                    border: '1px solid #eee',
-                    borderRadius: '4px'
-                  }}
+                  className="message-card"
                 >
-                  <h3 style={{ margin: '0 0 8px 0' }}>{msg.title}</h3>
+                  <h3 className="message-title">{msg.title}</h3>
                   <a
                     href={msg.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      color: '#1890ff',
-                      textDecoration: 'none',
-                      display: 'block',
-                      marginBottom: '8px'
-                    }}
+                    className="message-link"
                   >
                     {msg.link}
                   </a>
-                  <div style={{
-                    color: '#666',
-                    fontSize: '14px',
-                    lineHeight: '1.5'
-                  }}>
+                  <div className="message-content">
                     {expandedIds.has(index) ? msg.content : truncateText(msg.content)}
                     <div
                       onClick={() => toggleExpand(index)}
-                      style={{
-                        color: '#1890ff',
-                        cursor: 'pointer',
-                        marginTop: '8px',
-                        textAlign: 'right',
-                        fontSize: '13px'
-                      }}
+                      className="toggle-expand"
                     >
                       {expandedIds.has(index) ? 'collapse' : 'expand'}
                     </div>
                   </div>
                 </div>
               ))}
-              {loading && <div style={{ textAlign: 'center', padding: '10px' }}>loading more...</div>}
+              {loading && <div className="loading-more">loading more...</div>}
             </>
           )}
         </div>

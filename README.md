@@ -1,6 +1,6 @@
-<!-- <div align=center>
-<img  src="docs/logo.svg"/>
-</div> -->
+<div align=center>
+<img  src="docs/VIDAA.svg"/>
+</div>
 
 <h1 align="center">
   VIDAA
