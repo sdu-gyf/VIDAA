@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./VIDAA.svg" alt="VIDAA"/>
+  <img src="./LOGO.svg" alt="VIDAA" width="100" />
 </div>
 
 <h1 align="center">
