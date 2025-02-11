@@ -1,4 +1,4 @@
-from llm_interface import LLMBase, BaseAgent
+from llm_interface import LLMBase
 
 from openai import AsyncOpenAI
 from typing import Optional
@@ -21,18 +21,6 @@ class OpenAIImpl(LLMBase):
         return response.choices[0].message.content
 
 
-class OpenAIAgent(BaseAgent):
-    def __init__(self, model: OpenAIImpl, prompt: str):
-        self.model = model
-        self.prompt = {"role": "system", "content": prompt}
-
-    async def respond(self, message: str):
-        response = await self.model.chat(
-            [self.prompt, {"role": "user", "content": message}]
-        )
-        return response
-
-
 if __name__ == "__main__":
     import asyncio
     import os
@@ -44,10 +32,10 @@ if __name__ == "__main__":
         openai_impl = OpenAIImpl(
             base_url=base_url, model_name=model_name, api_key=api_key
         )
-        openai_agent = OpenAIAgent(
-            openai_impl, "你只能说“是”或者“不是”，不要回答任何其他多余内容\n"
+        openai_impl.set_system_prompt(
+            "你只能说“是”或者“不是”，不要回答任何其他多余内容\n"
         )
-        response = await openai_agent.respond("你是GPT吗")
+        response = await openai_impl.respond("你是GPT吗")
         print(response)
 
     asyncio.run(main())

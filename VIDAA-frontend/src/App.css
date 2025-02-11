@@ -1,49 +1,28 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-.message-container {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
+.animate-progress {
+  animation: progress 2s ease-in-out infinite;
 }
 
-.message-card {
-  margin: 15px 0;
-  padding: 10px;
-  border: 1px solid #eee;
-  border-radius: 4px;
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
-.message-title {
-  margin: 0 0 8px 0;
-}
-
-.message-link {
-  color: #1890ff;
-  text-decoration: none;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.message-content {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.toggle-expand {
-  color: #1890ff;
-  cursor: pointer;
-  margin-top: 8px;
-  text-align: right;
-  font-size: 13px;
-}
-
-.loading-more {
-  text-align: center;
-  padding: 10px;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

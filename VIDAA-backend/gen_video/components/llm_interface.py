@@ -3,6 +3,8 @@ from typing import Optional
 
 
 class LLMBase(ABC):
+    prompt: dict
+
     @abstractmethod
     def __init__(self, base_url: str, model_name: str, api_key: Optional[str] = None):
         pass
@@ -11,12 +13,9 @@ class LLMBase(ABC):
     async def chat(self, chats: list[dict]):
         pass
 
+    def set_system_prompt(self, prompt: str):
+        self.prompt = {"role": "system", "content": prompt}
 
-class BaseAgent(ABC):
-    @abstractmethod
-    def __init__(self, model: LLMBase, prompt: str):
-        pass
-
-    @abstractmethod
     async def respond(self, message: str):
-        pass
+        response = await self.chat([self.prompt, {"role": "user", "content": message}])
+        return response
