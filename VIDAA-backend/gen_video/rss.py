@@ -1,9 +1,9 @@
-from typing import AsyncGenerator, Dict, Any, Type, List, Tuple
+from typing import AsyncGenerator, Dict, Any, Type, List, Tuple, Optional
 from abc import ABC, abstractmethod
 from feedparser import parse
 import aiohttp
-import requests
 from bs4 import BeautifulSoup
+from db import make_async_sqlite_handler
 
 
 def rss_source(url: str, name: str):
@@ -40,6 +40,10 @@ class BaseRSSContent(ABC):
     _sources: Dict[str, Type["BaseRSSContent"]] = {}
     rss_url: str
     rss_name: str
+    request_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+    }
+    _session: Optional[aiohttp.ClientSession] = None
 
     def __init__(self):
         pass
@@ -88,25 +92,44 @@ class BaseRSSContent(ABC):
     def __str__(self):
         return f"{self.rss_name}: {self.rss_url}"
 
+    @classmethod
+    async def get_session(cls) -> aiohttp.ClientSession:
+        if cls._session is None:
+            cls._session = aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=30),
+                headers=cls.request_headers,
+                connector=aiohttp.TCPConnector(force_close=True, ssl=False, limit=10),
+                trust_env=True,
+            )
+        return cls._session
 
-@rss_source("https://plink.anyfeeder.com/nytimes/dual", "人民网-时政")
+    async def close(self):
+        if self._session is not None:
+            await self._session.close()
+            self._session = None
+
+
+@rss_source("https://plink.anyfeeder.com/nytimes/dual", "纽约时报双语版")
 class PeoplePoliticsContent(BaseRSSContent):
     async def get_detail(self, entry: Entry) -> Entry:
-        request_headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
-        }
-        # FIXME: aiohttp will timeout
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.get(entry.link, headers=request_headers) as response:
-        #         soup = BeautifulSoup(await response.text(), 'html.parser')
-        #         res = soup.find_all('div', class_='article-paragraph')
-        #         res = res[1::2]
-        response = requests.get(entry.link, headers=request_headers)
-        soup = BeautifulSoup(response.text, "html.parser")
-        res = soup.find_all("div", class_="article-paragraph")
-        res = "\n".join(p.text for p in res[1::2])
-        entry.set_content(res)
-        return entry
+        async with await make_async_sqlite_handler() as db:
+            article = await db.get_articles(entry.link)
+            if article:
+                entry.set_content(article[3])
+                return entry
+            session = await self.get_session()
+            async with session.get(
+                entry.link, headers=self.request_headers
+            ) as response:
+                content = await response.text()
+                soup = BeautifulSoup(content, "html.parser")
+                res = "\n".join(
+                    p.text
+                    for p in soup.find_all("div", class_="article-paragraph")[1::2]
+                )
+                entry.set_content(res)
+                await db.insert_article(entry.title, entry.link, self.rss_name, res)
+                return entry
 
 
 def get_rss_sources():
@@ -128,8 +151,16 @@ if __name__ == "__main__":
         rss_handler = BaseRSSContent.get_source_by_index(index)
         print(rss_handler)
 
+        entries = []
         async for item in rss_handler.get_entries():
-            detail = await rss_handler.get_detail(item)
+            entries.append(item)
+
+        # Modified to properly handle async gathering
+        details = await asyncio.gather(
+            *(rss_handler.get_detail(entry) for entry in entries)
+        )
+
+        for detail in details:
             print(detail.content)
 
     asyncio.run(main())

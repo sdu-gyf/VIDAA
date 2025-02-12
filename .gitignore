@@ -5,3 +5,4 @@ logs/
 vidaa.db
 node_modules/
 diff.txt
+.env

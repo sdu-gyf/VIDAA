@@ -33,6 +33,26 @@ class AsyncSQLiteHandler:
             {"model_name": i[0], "base_url": i[1]} for i in await self.cursor.fetchall()
         ]
 
+    async def insert_article(
+        self, title: str, url: str, from_rss_name: str, content: str
+    ):
+        await self.execute(
+            "INSERT INTO article (title, url, from_rss_name, content) VALUES (?, ?, ?, ?)",
+            (title, url, from_rss_name, content),
+        )
+
+    async def get_articles(self, url: str):
+        await self.execute(
+            "SELECT title, url, from_rss_name, content FROM article WHERE url = ?",
+            (url,),
+        )
+        result = await self.cursor.fetchall()
+        return result[0] if result else None
+
+
+async def make_async_sqlite_handler():
+    return AsyncSQLiteHandler(os.getenv("VIDAA_DB_PATH"))
+
 
 if __name__ == "__main__":
 
