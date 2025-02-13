@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HeroUIProvider } from '@heroui/react'
 import { Layout } from './components/Layout'
+import { GenVideoLayout } from './components/GenVideoLayout'
 import { HomePage } from './pages/Home'
-import { ArticleListPage } from './pages/ArticleList'
+import { GenVideoPage } from './pages/GenVideo'
 import { ComingSoonPage } from './pages/ComingSoon'
 import "./App.css"
 
@@ -13,7 +14,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
-            <Route path="articles" element={<ArticleListPage />} />
+            <Route path="gen-video" element={<GenVideoLayout />}>
+              <Route index element={<GenVideoPage />} />
+            </Route>
             <Route path="features" element={
               <ComingSoonPage
                 title="New Features Coming Soon"

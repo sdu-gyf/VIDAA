@@ -20,10 +20,10 @@ export function Layout() {
                 Home
               </Link>
               <Link
-                to="/articles"
+                to="/gen-video"
                 className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md"
               >
-                Articles
+                Generate Video
               </Link>
             </div>
           </div>

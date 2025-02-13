@@ -54,10 +54,5 @@ async def get_rss_content(index: int):
         headers={
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
-            "Content-Type": "text/event-stream",
-            "X-Accel-Buffering": "no",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
         },
     )
