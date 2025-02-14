@@ -27,9 +27,9 @@ async def get_rss_content(index: int):
             rss_handler = BaseRSSContent.get_source_by_index(index)
             gen_video_logger.info("RSS handler initialized")
 
-            async for item in rss_handler.get_entries():
+            async for item in rss_handler.get_articles():
                 try:
-                    detail = await rss_handler.get_detail(item)
+                    detail = await rss_handler.get_article(item)
                     data = {
                         "title": detail.title,
                         "link": detail.link,

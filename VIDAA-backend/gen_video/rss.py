@@ -18,7 +18,7 @@ def rss_source(url: str, name: str):
     return wrapper
 
 
-class Entry:
+class Article:
     title: str
     summary: str
     link: str
@@ -75,19 +75,29 @@ class BaseRSSContent(ABC):
             for index, name in enumerate(unique_sources.keys())
         ]
 
-    async def get_entries(self) -> AsyncGenerator[Entry, None]:
-        feed = parse(self.rss_url)
-        for entry in feed.entries:
-            res = Entry(
-                title=entry.title,
-                summary=entry.summary,
-                link=entry.link,
-            )
-            yield res
+    @abstractmethod
+    async def get_articles(self) -> AsyncGenerator[Article, None]:
+        pass
 
     @abstractmethod
-    async def get_detail(self, entry: Entry) -> Dict[str, Any]:
+    async def parse_content(self, content: str) -> str:
         pass
+
+    async def get_article(self, article: Article) -> Article:
+        async with await make_async_sqlite_handler() as db:
+            stored_article = await db.get_articles(article.link)
+            if stored_article:
+                article.set_content(stored_article[3])
+                return article
+            session = await self.get_session()
+            async with session.get(
+                article.link, headers=self.request_headers
+            ) as response:
+                content = await response.text()
+                res = await self.parse_content(content)
+                article.set_content(res)
+                await db.insert_article(article.title, article.link, self.rss_name, res)
+                return article
 
     def __str__(self):
         return f"{self.rss_name}: {self.rss_url}"
@@ -110,26 +120,43 @@ class BaseRSSContent(ABC):
 
 
 @rss_source("https://plink.anyfeeder.com/nytimes/dual", "纽约时报双语版")
-class PeoplePoliticsContent(BaseRSSContent):
-    async def get_detail(self, entry: Entry) -> Entry:
-        async with await make_async_sqlite_handler() as db:
-            article = await db.get_articles(entry.link)
-            if article:
-                entry.set_content(article[3])
-                return entry
-            session = await self.get_session()
-            async with session.get(
-                entry.link, headers=self.request_headers
-            ) as response:
-                content = await response.text()
-                soup = BeautifulSoup(content, "html.parser")
-                res = "\n".join(
-                    p.text
-                    for p in soup.find_all("div", class_="article-paragraph")[1::2]
-                )
-                entry.set_content(res)
-                await db.insert_article(entry.title, entry.link, self.rss_name, res)
-                return entry
+class NYTimesContent(BaseRSSContent):
+
+    async def get_articles(self) -> AsyncGenerator[Article, None]:
+        feed = parse(self.rss_url)
+        for entry in feed.entries:
+            article = Article(
+                title=entry.title,
+                summary=entry.summary,
+                link=entry.link,
+            )
+            yield article
+
+    async def parse_content(self, content: str) -> str:
+        soup = BeautifulSoup(content, "html.parser")
+        res = "\n".join(
+            p.text for p in soup.find_all("div", class_="article-paragraph")[1::2]
+        )
+        return res
+
+
+@rss_source("https://plink.anyfeeder.com/chinadaily/china", "中国日报: 时政")
+class ChinaDailyPolitics(BaseRSSContent):
+
+    async def get_articles(self) -> AsyncGenerator[Article, None]:
+        feed = parse(self.rss_url)
+        for entry in feed.entries:
+            article = Article(
+                title=entry.title,
+                summary=entry.summary,
+                link=entry.link,
+            )
+            yield article
+
+    async def parse_content(self, content: str) -> str:
+        soup = BeautifulSoup(content, "html.parser")
+        res = "\n".join(p.text for p in soup.find_all("p")).replace("关闭", "")
+        return res
 
 
 def get_rss_sources():
@@ -151,13 +178,13 @@ if __name__ == "__main__":
         rss_handler = BaseRSSContent.get_source_by_index(index)
         print(rss_handler)
 
-        entries = []
-        async for item in rss_handler.get_entries():
-            entries.append(item)
+        articles = []
+        async for item in rss_handler.get_articles():
+            articles.append(item)
 
         # Modified to properly handle async gathering
         details = await asyncio.gather(
-            *(rss_handler.get_detail(entry) for entry in entries)
+            *(rss_handler.get_article(article) for article in articles)
         )
 
         for detail in details:
