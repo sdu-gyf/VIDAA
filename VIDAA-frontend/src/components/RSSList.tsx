@@ -14,7 +14,7 @@ interface RSSListProps {
   displayMode?: 'tabs' | 'list'
 }
 
-// 创建一个缓存对象来存储 RSS 源数据
+// create a cache object to store RSS source data
 const rssSourcesCache: {
   data: RSSSource[] | null
   timestamp: number | null
@@ -28,9 +28,9 @@ export function RSSList({ onSelect, onConfirm, selectedIndex, displayMode = 'lis
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 使用 useMemo 来缓存获取数据的函数
+  // use useMemo to cache the data fetching function
   const fetchRSSSources = useMemo(() => async () => {
-    // 如果缓存存在且未过期（这里设置 5 分钟过期），直接使用缓存
+    // if the cache exists and is not expired (here set 5 minutes expiration), use the cache directly
     if (rssSourcesCache.data && rssSourcesCache.timestamp &&
         Date.now() - rssSourcesCache.timestamp < 5 * 60 * 1000) {
       setRssSources(rssSourcesCache.data)
@@ -45,7 +45,7 @@ export function RSSList({ onSelect, onConfirm, selectedIndex, displayMode = 'lis
       }
       const data = await response.json()
 
-      // 更新缓存
+      // update the cache
       rssSourcesCache.data = data
       rssSourcesCache.timestamp = Date.now()
 

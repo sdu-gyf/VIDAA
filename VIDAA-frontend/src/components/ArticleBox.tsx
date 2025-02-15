@@ -19,10 +19,16 @@ import { Article } from '../types/article';
 interface ArticleBoxProps {
   articles: Article[];
   loading: boolean;
+  onArticleSelect?: (article: Article, selected: boolean) => void;
+  selectedArticles?: Article[];
 }
 
-export function ArticleBox({ articles, loading }: ArticleBoxProps) {
+export function ArticleBox({ articles, loading, onArticleSelect, selectedArticles = [] }: ArticleBoxProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const isArticleSelected = (article: Article) => {
+    return selectedArticles.some(selected => selected.link === article.link);
+  };
 
   const openArticle = (index: number) => {
     setExpandedId(index);
@@ -30,6 +36,19 @@ export function ArticleBox({ articles, loading }: ArticleBoxProps) {
 
   const closeArticle = () => {
     setExpandedId(null);
+  };
+
+  const handleCardPress = (article: Article) => {
+    onArticleSelect?.(article, !isArticleSelected(article));
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleShowMore = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    openArticle(index);
   };
 
   if (!articles.length) {
@@ -67,44 +86,61 @@ export function ArticleBox({ articles, loading }: ArticleBoxProps) {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.map((article, index) => (
-          <Card
+          <div
             key={index}
-            className="max-w-[400px] border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
-            shadow="none"
+            className={`group relative cursor-pointer`}
+            onClick={() => handleCardPress(article)}
           >
-            <CardHeader className="flex gap-3 h-[80px]">
-              <div className="flex flex-col">
-                <p className="text-md font-medium line-clamp-2">{article.title}</p>
-                <p className="text-small text-default-500 mt-1">
-                  {new URL(article.link).hostname}
+            <Card
+              className={`max-w-[400px] border-2 rounded-2xl overflow-hidden shadow-xl
+                ${isArticleSelected(article)
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 group-hover:border-blue-300 group-hover:shadow-2xl group-hover:-translate-y-1'
+                } transition-all duration-200`}
+              shadow="none"
+            >
+              <CardHeader className="flex gap-3 h-[80px]">
+                <div className="flex flex-col flex-grow">
+                  <p className="text-md font-medium line-clamp-2">{article.title}</p>
+                  <p className="text-small text-default-500 mt-1">
+                    {new URL(article.link).hostname}
+                  </p>
+                </div>
+                {isArticleSelected(article) && (
+                  <div className="text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
+                )}
+              </CardHeader>
+              <Divider/>
+              <CardBody>
+                <p className="line-clamp-4">
+                  {truncateText(article.content, 300)}
                 </p>
-              </div>
-            </CardHeader>
-            <Divider/>
-            <CardBody>
-              <p className="line-clamp-4">
-                {truncateText(article.content, 300)}
-              </p>
-            </CardBody>
-            <Divider/>
-            <CardFooter className="flex justify-between">
-              <Link
-                isExternal
-                showAnchorIcon
-                href={article.link}
-              >
-                Visit article
-              </Link>
-              <Button
-                color="primary"
-                variant="light"
-                size="sm"
-                onPress={() => openArticle(index)}
-              >
-                Show More
-              </Button>
-            </CardFooter>
-          </Card>
+              </CardBody>
+              <Divider/>
+              <CardFooter className="flex justify-between">
+                <Link
+                  isExternal
+                  showAnchorIcon
+                  href={article.link}
+                  onClick={handleLinkClick}
+                >
+                  Visit article
+                </Link>
+                <Button
+                  color="primary"
+                  variant="light"
+                  size="sm"
+                  onClick={(e) => handleShowMore(e, index)}
+                >
+                  Show More
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         ))}
         {loading && (
           <div className="col-span-full">
@@ -123,17 +159,18 @@ export function ArticleBox({ articles, loading }: ArticleBoxProps) {
         onClose={closeArticle}
         size="2xl"
         scrollBehavior="inside"
-        backdrop="blur"
-        className="bg-white dark:bg-gray-800"
+        backdrop="opaque"
+        className="fixed inset-0 flex items-start justify-center z-50 mt-20"
       >
-        <ModalContent className="bg-white dark:bg-gray-800">
+        <div className="fixed inset-0 bg-black/50" />
+        <ModalContent className="max-h-[80vh] w-[90vw] max-w-4xl mx-auto bg-white dark:bg-gray-800 relative">
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 border-b">
                 {expandedId !== null && articles[expandedId].title}
               </ModalHeader>
-              <ModalBody className="bg-white dark:bg-gray-800">
-                <p className="whitespace-pre-line text-gray-800 dark:text-gray-200">
+              <ModalBody className="overflow-y-auto">
+                <p className="whitespace-pre-line">
                   {expandedId !== null && articles[expandedId].content}
                 </p>
               </ModalBody>

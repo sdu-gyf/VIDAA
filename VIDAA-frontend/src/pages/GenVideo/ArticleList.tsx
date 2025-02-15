@@ -10,16 +10,27 @@ interface ArticleListPageProps {
     name: string
     url: string
   }
+  selectedArticles?: Article[]
+  onArticleSelect?: (article: Article, selected: boolean) => void
 }
 
-export function ArticleListPage({ rssIndex }: ArticleListPageProps) {
+export function ArticleListPage({
+  rssIndex,
+  selectedArticles,
+  onArticleSelect
+}: ArticleListPageProps) {
   const { data: articles, loading, error } = useEventSource<Article>(
     `${API_BASE_URL}/gen_video/rss_content?index=${rssIndex}`
   )
 
   return (
     <div>
-      <ArticleBox articles={articles} loading={loading} />
+      <ArticleBox
+        articles={articles}
+        loading={loading}
+        selectedArticles={selectedArticles}
+        onArticleSelect={onArticleSelect}
+      />
     </div>
   )
 }

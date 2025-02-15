@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { ArticleListPage } from './ArticleList'
 import { ComingSoonPage } from '../ComingSoon'
 import { RSSList } from '../../components/RSSList'
-import { Tabs, Tab } from '@heroui/react'
+import { Tabs, Tab, Button } from '@heroui/react'
 import { API_BASE_URL } from '../../config'
+import { Article } from '../../types/article'
 
 interface RSSSource {
   index: number
@@ -21,13 +22,6 @@ const steps = [
   },
   {
     number: 2,
-    title: "Video Settings",
-    description: "Customize video generation settings",
-    id: "settings",
-    enabled: false
-  },
-  {
-    number: 3,
     title: "Generate",
     description: "Start video generation process",
     id: "generate",
@@ -38,6 +32,14 @@ const steps = [
 export function GenVideoPage() {
   const [currentStep, setCurrentStep] = useState(steps[0].id)
   const [selectedRSS, setSelectedRSS] = useState<RSSSource | null>(null)
+  const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
+
+  // Update steps to enable/disable based on selection
+  const updatedSteps = steps.map(step => ({
+    ...step,
+    enabled: step.id === 'articles' ||
+             (step.id === 'generate' && selectedArticles.length > 0)
+  }))
 
   // Set default RSS source on component mount
   useEffect(() => {
@@ -45,14 +47,29 @@ export function GenVideoPage() {
       .then(response => response.json())
       .then(sources => {
         if (sources.length > 0) {
-          setSelectedRSS(sources[0]); // Set first RSS source as default
+          setSelectedRSS(sources[0])
         }
       })
-      .catch(error => console.error('Error fetching RSS sources:', error));
-  }, []);
+      .catch(error => console.error('Error fetching RSS sources:', error))
+  }, [])
 
   const handleRSSSelect = (source: RSSSource | null) => {
     setSelectedRSS(source)
+  }
+
+  const handleArticleSelect = (article: Article, selected: boolean) => {
+    if (selected) {
+      setSelectedArticles(prev => [...prev, article])
+    } else {
+      setSelectedArticles(prev => prev.filter(a => a.link !== article.link))
+    }
+  }
+
+  const handleNextStep = () => {
+    const currentIndex = steps.findIndex(step => step.id === currentStep)
+    if (currentIndex < steps.length - 1) {
+      setCurrentStep(steps[currentIndex + 1].id)
+    }
   }
 
   const renderStepContent = (stepId: string) => {
@@ -66,15 +83,48 @@ export function GenVideoPage() {
                 onSelect={handleRSSSelect}
                 selectedIndex={selectedRSS?.index}
                 displayMode="tabs"
+                onConfirm={() => {}}
               />
             </div>
 
             {/* Articles List */}
             {selectedRSS ? (
-              <ArticleListPage
-                rssIndex={selectedRSS.index}
-                rssSource={selectedRSS}
-              />
+              <>
+                <ArticleListPage
+                  rssIndex={selectedRSS.index}
+                  rssSource={selectedRSS}
+                  selectedArticles={selectedArticles}
+                  onArticleSelect={handleArticleSelect}
+                />
+                {selectedArticles.length > 0 && (
+                  <div className="fixed bottom-8 right-8 z-10">
+                    <Button
+                      color="primary"
+                      size="lg"
+                      onPress={handleNextStep}
+                      className="shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 rounded-full px-8 py-6 bg-gradient-to-r from-blue-600 to-blue-500"
+                      endContent={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-5 h-5 ml-2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                          />
+                        </svg>
+                      }
+                    >
+                      Next Step • {selectedArticles.length} Selected
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-12 text-gray-500">
                 Please select an RSS source to view articles
@@ -82,6 +132,8 @@ export function GenVideoPage() {
             )}
           </div>
         )
+      case 'generate':
+        return <ComingSoonPage />
       default:
         return <ComingSoonPage />
     }
@@ -94,7 +146,7 @@ export function GenVideoPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-6">Progress</h2>
         <nav aria-label="Progress">
           <ol className="space-y-4">
-            {steps.map((step) => (
+            {updatedSteps.map((step) => (
               <li key={step.id}>
                 <button
                   onClick={() => step.enabled && setCurrentStep(step.id)}
