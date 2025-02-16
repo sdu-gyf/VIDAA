@@ -3,9 +3,28 @@ type EventSourceCallback<T> = (data: T) => void;
 export class EventSourceService<T> {
   private eventSource: EventSource | null = null;
   private url: string;
+  private retryCount: number = 0;
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_DELAY = 1000;
 
   constructor(url: string) {
     this.url = url;
+  }
+
+  private retry(callbacks: {
+    onMessage?: EventSourceCallback<T>;
+    onComplete?: () => void;
+    onError?: (error: string) => void;
+  }): void {
+    if (this.retryCount < this.MAX_RETRIES) {
+      this.retryCount++;
+      setTimeout(() => {
+        this.connect(callbacks);
+      }, this.RETRY_DELAY * this.retryCount);
+    } else {
+      callbacks.onError?.('Maximum retry attempts reached');
+      this.disconnect();
+    }
   }
 
   connect(callbacks: {
@@ -31,20 +50,20 @@ export class EventSourceService<T> {
 
         if (data.type === 'error') {
           callbacks.onError?.(data.error || 'Unknown error');
-          this.disconnect();
+          this.retry(callbacks);
           return;
         }
 
+        this.retryCount = 0; // Reset retry count on successful message
         callbacks.onMessage?.(data);
       } catch (error) {
         callbacks.onError?.('Failed to parse message');
-        this.disconnect();
+        this.retry(callbacks);
       }
     };
 
     this.eventSource.onerror = () => {
-      callbacks.onError?.('Connection error');
-      this.disconnect();
+      this.retry(callbacks);
     };
   }
 
@@ -52,6 +71,7 @@ export class EventSourceService<T> {
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
+      this.retryCount = 0;
     }
   }
 }

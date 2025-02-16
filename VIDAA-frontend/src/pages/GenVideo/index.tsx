@@ -1,76 +1,17 @@
-import { useState, useEffect } from 'react'
 import { ArticleListPage } from './ArticleList'
 import { ComingSoonPage } from '../ComingSoon'
-import { RSSList } from '../../components/RSSList'
-import { Tabs, Tab, Button } from '@heroui/react'
-import { API_BASE_URL } from '../../config'
-import { Article } from '../../types/article'
-
-interface RSSSource {
-  index: number
-  name: string
-  url: string
-}
-
-const steps = [
-  {
-    number: 1,
-    title: "Select Articles",
-    description: "Choose articles to generate video from",
-    id: "articles",
-    enabled: true
-  },
-  {
-    number: 2,
-    title: "Generate",
-    description: "Start video generation process",
-    id: "generate",
-    enabled: false
-  }
-]
+import { RSSList } from '../../components/rss/RSSList'
+import { Button } from '@heroui/react'
+import { useVideoGeneration } from '../../hooks/useVideoGeneration'
 
 export function GenVideoPage() {
-  const [currentStep, setCurrentStep] = useState(steps[0].id)
-  const [selectedRSS, setSelectedRSS] = useState<RSSSource | null>(null)
-  const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
-
-  // Update steps to enable/disable based on selection
-  const updatedSteps = steps.map(step => ({
-    ...step,
-    enabled: step.id === 'articles' ||
-             (step.id === 'generate' && selectedArticles.length > 0)
-  }))
-
-  // Set default RSS source on component mount
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/gen_video/rss_list`)
-      .then(response => response.json())
-      .then(sources => {
-        if (sources.length > 0) {
-          setSelectedRSS(sources[0])
-        }
-      })
-      .catch(error => console.error('Error fetching RSS sources:', error))
-  }, [])
-
-  const handleRSSSelect = (source: RSSSource | null) => {
-    setSelectedRSS(source)
-  }
-
-  const handleArticleSelect = (article: Article, selected: boolean) => {
-    if (selected) {
-      setSelectedArticles(prev => [...prev, article])
-    } else {
-      setSelectedArticles(prev => prev.filter(a => a.link !== article.link))
-    }
-  }
-
-  const handleNextStep = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep)
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1].id)
-    }
-  }
+  const {
+    state: { currentStep, selectedRSS, selectedArticles },
+    steps,
+    handleRSSSelect,
+    handleArticleSelect,
+    setCurrentStep
+  } = useVideoGeneration()
 
   const renderStepContent = (stepId: string) => {
     switch (stepId) {
@@ -83,7 +24,6 @@ export function GenVideoPage() {
                 onSelect={handleRSSSelect}
                 selectedIndex={selectedRSS?.index}
                 displayMode="tabs"
-                onConfirm={() => {}}
               />
             </div>
 
@@ -101,7 +41,7 @@ export function GenVideoPage() {
                     <Button
                       color="primary"
                       size="lg"
-                      onPress={handleNextStep}
+                      onPress={() => setCurrentStep('generate')}
                       className="shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 rounded-full px-8 py-6 bg-gradient-to-r from-blue-600 to-blue-500"
                       endContent={
                         <svg
@@ -146,7 +86,7 @@ export function GenVideoPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-6">Progress</h2>
         <nav aria-label="Progress">
           <ol className="space-y-4">
-            {updatedSteps.map((step) => (
+            {steps.map((step) => (
               <li key={step.id}>
                 <button
                   onClick={() => step.enabled && setCurrentStep(step.id)}

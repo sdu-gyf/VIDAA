@@ -1,7 +1,7 @@
-import { ArticleBox } from '../../components/ArticleBox'
+import { ArticleBox } from '../../components/article/ArticleBox'
 import { useEventSource } from '../../hooks/useEventSource'
 import { Article } from '../../types/article'
-import { API_BASE_URL } from '../../config'
+import { getApiUrl } from '../../constants/api'
 
 interface ArticleListPageProps {
   rssIndex: number
@@ -20,7 +20,7 @@ export function ArticleListPage({
   onArticleSelect
 }: ArticleListPageProps) {
   const { data: articles, loading, error } = useEventSource<Article>(
-    `${API_BASE_URL}/gen_video/rss_content?index=${rssIndex}`
+    getApiUrl('RSS_CONTENT', { index: rssIndex })
   )
 
   return (
