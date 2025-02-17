@@ -80,7 +80,7 @@ class BaseRSSContent(ABC):
         pass
 
     @abstractmethod
-    async def parse_content(self, content: str) -> str:
+    def parse_content(self, content: str) -> str:
         pass
 
     async def get_article(self, article: Article) -> Article:
@@ -94,7 +94,7 @@ class BaseRSSContent(ABC):
                 article.link, headers=self.request_headers
             ) as response:
                 content = await response.text()
-                res = await self.parse_content(content)
+                res = self.parse_content(content)
                 article.set_content(res)
                 await db.insert_article(article.title, article.link, self.rss_name, res)
                 return article
@@ -132,7 +132,7 @@ class NYTimesContent(BaseRSSContent):
             )
             yield article
 
-    async def parse_content(self, content: str) -> str:
+    def parse_content(self, content: str) -> str:
         soup = BeautifulSoup(content, "html.parser")
         res = "\n".join(
             p.text for p in soup.find_all("div", class_="article-paragraph")[1::2]
@@ -153,7 +153,7 @@ class ChinaDailyPolitics(BaseRSSContent):
             )
             yield article
 
-    async def parse_content(self, content: str) -> str:
+    def parse_content(self, content: str) -> str:
         soup = BeautifulSoup(content, "html.parser")
         res = "\n".join(p.text for p in soup.find_all("p")).replace("关闭", "")
         return res
