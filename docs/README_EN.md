@@ -47,3 +47,14 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
 - [ ] Unified management of login status across video platforms
 - [ ] Real-time display of video publishing status
 - [ ] Display historical video information
+
+## Acknowledgements
+
+The video upload functionality is inspired by the following projects, thank you for your contributions to open source, without your exploration, this project would not have been possible:
+
+- [dreammis/social-auto-upload](https://github.com/dreammis/social-auto-upload)
+- [ReaJason/xhs](https://github.com/ReaJason/xhs)
+- [Superheroff/douyin_uplod](https://github.com/Superheroff/douyin_uplod)
+- [lishang520/DouYin-Auto-Upload](https://github.com/lishang520/DouYin-Auto-Upload)
+- [kebenxiaoming/matrix](https://github.com/kebenxiaoming/matrix)
+- [biliup/biliup-rs](https://github.com/biliup/biliup-rs)

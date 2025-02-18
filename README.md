@@ -28,7 +28,7 @@ VIDAA是一个一站式视频制作分发平台，通过大模型的能力制作
 
 ## 功能特性
 
-后端能力
+### 后端能力
 
 - **视频生成**
   - [x] RSS抓取
@@ -38,12 +38,12 @@ VIDAA是一个一站式视频制作分发平台，通过大模型的能力制作
   - [ ] 图片生成
   - [ ] 视频打包
 - **视频发布**
-    - [ ] 抖音
-    - [ ] 小红书
-    - [ ] bilibili
-    - [ ] 其余待支持的平台...
+  - [ ] 抖音
+  - [ ] 小红书
+  - [ ] bilibili
+  - [ ] 其余待支持的平台...
 
-前端能力
+###前端能力
 
 - [ ] RSS 源的管理与修改
 - [ ] 模型提示词的调整
@@ -51,3 +51,14 @@ VIDAA是一个一站式视频制作分发平台，通过大模型的能力制作
 - [ ] 各视频平台统一管理登录状态
 - [ ] 视频实时发布状态展示
 - [ ] 往期视频信息展示
+
+## 致谢
+
+视频上传功能参考了以下项目，鸣谢项目作者们对于开源的贡献，以下排名不分先后，正因为有先驱者的探索，才有了此项目顺利落地。
+
+- [dreammis/social-auto-upload](https://github.com/dreammis/social-auto-upload)
+- [ReaJason/xhs](https://github.com/ReaJason/xhs)
+- [Superheroff/douyin_uplod](https://github.com/Superheroff/douyin_uplod)
+- [lishang520/DouYin-Auto-Upload](https://github.com/lishang520/DouYin-Auto-Upload)
+- [kebenxiaoming/matrix](https://github.com/kebenxiaoming/matrix)
+- [biliup/biliup-rs](https://github.com/biliup/biliup-rs)
