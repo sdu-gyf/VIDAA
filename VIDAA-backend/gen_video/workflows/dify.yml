@@ -1,0 +1,557 @@
+app:
+  description: Video Instant Distribution & Assemble Automation
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: divaa
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: tool
+      id: 1738844366333-source-1739520491653-target
+      selected: false
+      source: '1738844366333'
+      sourceHandle: source
+      target: '1739520491653'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: parameter-extractor
+      id: 1739520491653-source-1739521132152-target
+      selected: false
+      source: '1739520491653'
+      sourceHandle: source
+      target: '1739521132152'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: llm
+      id: 1739521132152-source-1740039734537-target
+      selected: false
+      source: '1739521132152'
+      sourceHandle: source
+      target: '1740039734537'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1740039734537-source-1740040303092-target
+      source: '1740039734537'
+      sourceHandle: source
+      target: '1740040303092'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: llm
+      id: 1739521132152-source-17400405563060-target
+      source: '1739521132152'
+      sourceHandle: source
+      target: '17400405563060'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1740039734537-source-1740040839740-target
+      source: '1740039734537'
+      sourceHandle: source
+      target: '1740040839740'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 17400405563060-source-17400408589150-target
+      source: '17400405563060'
+      sourceHandle: source
+      target: '17400408589150'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1740040303092-source-17400408719720-target
+      source: '1740040303092'
+      sourceHandle: source
+      target: '17400408719720'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 17400408719720-source-1740041221708-target
+      source: '17400408719720'
+      sourceHandle: source
+      target: '1740041221708'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 1740040839740-source-1740041221708-target
+      source: '1740040839740'
+      sourceHandle: source
+      target: '1740041221708'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 17400408589150-source-1740041221708-target
+      source: '17400408589150'
+      sourceHandle: source
+      target: '1740041221708'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: input
+          max_length: 256
+          options: []
+          required: true
+          type: text-input
+          variable: input
+      height: 89
+      id: '1738844366333'
+      position:
+        x: 29.771780063733672
+        y: 248.5
+      positionAbsolute:
+        x: 29.771780063733672
+        y: 248.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        provider_id: webscraper
+        provider_name: webscraper
+        provider_type: builtin
+        selected: false
+        title: get_article
+        tool_configurations:
+          generate_summary: 0
+          user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+            (KHTML, like Gecko) Chrome/100.0.1000.0 Safari/537.36
+        tool_label: 网页爬虫
+        tool_name: webscraper
+        tool_parameters:
+          url:
+            type: mixed
+            value: '{{#1738844366333.input#}}'
+        type: tool
+      height: 115
+      id: '1739520491653'
+      position:
+        x: 334
+        y: 248.5
+      positionAbsolute:
+        x: 334
+        y: 248.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: 'context：get all chinese context
+
+          title: get title from article'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen-plus
+          provider: tongyi
+        parameters:
+        - description: get all chinese context
+          name: context
+          required: true
+          type: string
+        - description: get title from article
+          name: title
+          required: true
+          type: string
+        query:
+        - '1739520491653'
+        - text
+        reasoning_mode: prompt
+        selected: true
+        title: get_title_and_context
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '1739521132152'
+      position:
+        x: 774.7961335846443
+        y: 202.3325383957876
+      positionAbsolute:
+        x: 774.7961335846443
+        y: 202.3325383957876
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1739521132152'
+          - context
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5-72b-instruct
+          provider: tongyi
+        prompt_template:
+        - id: e6cb2224-10bf-417f-86a3-18563abdc9fa
+          role: system
+          text: "# 智能助手提示词\n\n## 角色设定：\n你是一位专业的内容改写助手，擅长将新闻文章转换为**适合口播**的新闻稿，使其更加生动、有吸引力，并适用于视频或音频播报。\n\
+            \n## 任务：\n请将以下新闻文章改写为**一分钟左右的口播稿**（约200字）。如果原文较短，仅调整表达方式，不额外补充信息。**避免涉及政治敏感内容**，但需确保新闻具有吸引力和传播价值。\n\
+            \n## 关键要求：\n- **口语化表达**：使用自然流畅的语言，让主播朗读时更有代入感。  \n- **吸引注意**：突出新闻爆点，增强悬念或冲击力，让观众愿意听下去。\
+            \  \n- **信息精准**：忠实于原新闻，不夸大、不歪曲，确保事实准确。  \n- **结构清晰**：适当使用短句，优化停顿，提升可听性和节奏感。\
+            \  \n\n## 输入格式：\n请提供完整的新闻文章作为输入。  \n\n## 输出格式：\n以**适合口播**的新闻稿形式输出，**简洁、生动、有感染力**，控制在**200字左右**。\
+            \  \n\n以下是新闻内容\n{{#1739521132152.context#}}"
+        selected: false
+        title: summarize_context
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '1740039734537'
+      position:
+        x: 1093.9058498989639
+        y: 74.73324138039777
+      positionAbsolute:
+        x: 1093.9058498989639
+        y: 74.73324138039777
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1740039734537'
+          - text
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5-72b-instruct
+          provider: tongyi
+        prompt_template:
+        - id: 899db469-6040-44bf-ba0f-82e1e7085b35
+          role: system
+          text: "# 智能助手提示词\n\n## 角色设定：\n你是一位专业的内容分析助手，擅长从文本中提取关键信息，并优化其呈现方式。你的任务是根据口播稿的内容，每隔**5秒**提取一个适合作为**背景图**的**名词**，以增强视觉表达。\n\
+            \n## 任务：\n从以下**一分钟左右的口播稿**中，按照**每5秒钟的文本量**，提取一个**核心名词**，该名词应能代表该时间段的主要信息，并适合作为背景图元素（如**股市、比特币、AI、芯片**等）。\n\
+            \n## 关键要求：\n- **精准提取**：确保所选名词能够概括该时间段的主要内容。  \n- **信息简洁**：每个名词不超过**3个字**，必要时可使用常见缩写（如AI、NFT）。\
+            \  \n- **增强可视化**：优先选择**具体、直观**的词汇，便于背景图呈现。  \n- **符合节奏**：按照**5秒钟的文本量**进行划分，确保信息分布均匀。\
+            \  \n\n## 输入格式：\n请提供完整的**一分钟左右的口播稿**作为输入。  \n\n## 输出格式：\n按**时间节点**提取名词，并以列表形式输出，例如：\
+            \  \n-  **股市**  , **比特币**  ，**AI**  ，**芯片**  \n（以此类推，每5秒一个名词）  \n\n以下是口播稿\n\
+            {{#1740039734537.text#}}"
+        selected: false
+        title: get_backgroud_keyword
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '1740040303092'
+      position:
+        x: 1484.562641263802
+        y: 172.33253839578765
+      positionAbsolute:
+        x: 1484.562641263802
+        y: 172.33253839578765
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1739521132152'
+          - title
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5-72b-instruct
+          provider: tongyi
+        prompt_template:
+        - id: e6cb2224-10bf-417f-86a3-18563abdc9fa
+          role: system
+          text: "# 智能助手提示词\n\n## 角色设定：\n你是一位专业的新闻标题优化助手，擅长将**新闻稿标题**改写为**视频新闻标题**，以增强吸引力，同时保持真实性，不夸大事实。\n\
+            \n## 任务：\n请根据以下**新闻稿标题**，改写为**适合视频新闻的标题**，确保能够吸引观众点击，同时不失准确性和专业性。\n\n\
+            ## 关键要求：\n- **突出爆点**：提炼新闻中最具吸引力的核心信息，使标题更具冲击力。  \n- **避免夸大**：确保标题忠实于新闻内容，不制造误导或夸张表述。\
+            \  \n- **简洁有力**：控制在**15字以内**，使用短句或关键词组合提升可读性。  \n- **适应视频风格**：可以加入**悬念、对比、数字、热点词**等元素，以增强传播效果。\
+            \  \n\n## 输入格式：\n新闻稿标题：  \n`[原始新闻标题]`  \n\n## 输出格式：\n视频新闻标题优化方案：  \n1.\
+            \ **[优化后的视频新闻标题]**  \n2. **[备选标题1]**  \n3. **[备选标题2]**  \n\n## 示例：\n###\
+            \ 输入：\n新闻稿标题：  \n`全球首款 AI 机器人正式发布，业内评价褒贬不一`  \n\n### 输出：\n视频新闻标题优化方案：\
+            \  \n1. **首款 AI 机器人来了！业内评价两极分化**  \n2. **AI 机器人发布！科技突破还是噱头？**  \n3. **颠覆还是泡沫？全球首款\
+            \ AI 机器人亮相！**  \n\n新闻稿标题：\n{{#1739521132152.title#}}"
+        selected: false
+        title: summarize_title
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '17400405563060'
+      position:
+        x: 1103.4153721773043
+        y: 364.11425461664106
+      positionAbsolute:
+        x: 1103.4153721773043
+        y: 364.11425461664106
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: The input is an abstract of an article, but there may be some
+          redundant information. Only the abstract is kept and unnecessary information
+          is removed.
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen-turbo-latest
+          provider: tongyi
+        parameters:
+        - description: The input is an abstract of an article, but there may be some
+            redundant information. Only the abstract is kept and unnecessary information
+            is removed.
+          name: context
+          required: true
+          type: string
+        query:
+        - '1740039734537'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: get_summarized_context
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '1740040839740'
+      position:
+        x: 1458.8483555495163
+        y: 16.90396696721629
+      positionAbsolute:
+        x: 1458.8483555495163
+        y: 16.90396696721629
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: The input is several titles, turn them into a list
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen-turbo-latest
+          provider: tongyi
+        parameters:
+        - description: The input is several titles, turn them into a list
+          name: title
+          required: true
+          type: array[string]
+        query:
+        - '17400405563060'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: get_summarized_title
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '17400408589150'
+      position:
+        x: 1441.9868007487328
+        y: 442.1996174100502
+      positionAbsolute:
+        x: 1441.9868007487328
+        y: 442.1996174100502
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen-turbo-latest
+          provider: tongyi
+        parameters:
+        - description: The input is several keywords, turn them into a list
+          name: keywords
+          required: false
+          type: array[string]
+        query:
+        - '1740040303092'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: get_keyword
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '17400408719720'
+      position:
+        x: 1764.843943605876
+        y: 172.33253839578765
+      positionAbsolute:
+        x: 1764.843943605876
+        y: 172.33253839578765
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '17400408589150'
+          - title
+          variable: title_list
+        - value_selector:
+          - '1740040839740'
+          - context
+          variable: context
+        - value_selector:
+          - '17400408719720'
+          - keywords
+          variable: keywords
+        selected: false
+        title: 结束
+        type: end
+      height: 141
+      id: '1740041221708'
+      position:
+        x: 2223.414870296415
+        y: 178.93007794965212
+      positionAbsolute:
+        x: 2223.414870296415
+        y: 178.93007794965212
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -495.48892197367877
+      y: 324.85428906601265
+      zoom: 1.0610015965572788
