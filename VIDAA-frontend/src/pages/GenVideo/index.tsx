@@ -3,6 +3,9 @@ import { ComingSoonPage } from '../ComingSoon'
 import { RSSList } from '../../components/rss/RSSList'
 import { Button } from '@heroui/react'
 import { useVideoGeneration } from '../../hooks/useVideoGeneration'
+import { useRSSSources } from '../../hooks/useRSSSources'
+import { useEffect } from 'react'
+import { VideoConfigList } from '../../components/video/VideoConfigList'
 
 export function GenVideoPage() {
   const {
@@ -12,6 +15,14 @@ export function GenVideoPage() {
     handleArticleSelect,
     setCurrentStep
   } = useVideoGeneration()
+
+  const { rssSources, loading: rssSourcesLoading } = useRSSSources()
+
+  useEffect(() => {
+    if (!selectedRSS && !rssSourcesLoading && rssSources.length > 0) {
+      handleRSSSelect(rssSources[0])
+    }
+  }, [rssSourcesLoading, rssSources, selectedRSS, handleRSSSelect])
 
   const renderStepContent = (stepId: string) => {
     switch (stepId) {
@@ -73,7 +84,25 @@ export function GenVideoPage() {
           </div>
         )
       case 'generate':
-        return <ComingSoonPage />
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Video Configuration ({selectedArticles.length} articles)
+              </h2>
+              <VideoConfigList articles={selectedArticles} />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                color="primary"
+                size="lg"
+                className="rounded-full px-8"
+              >
+                Generate Video
+              </Button>
+            </div>
+          </div>
+        )
       default:
         return <ComingSoonPage />
     }

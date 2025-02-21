@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from utils.vidaa_logger import gen_video_logger
 import json
 from .rss import get_rss_sources, BaseRSSContent
+from .workflows.dify import run_workflow
 
 gen_video_router = APIRouter(prefix="/gen_video", tags=["gen_video"])
 
@@ -55,4 +56,18 @@ async def get_rss_content(index: int):
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
         },
+    )
+
+
+@gen_video_router.get("/dify")
+async def run_dify(url: str):
+    async def content_generator():
+        async for item in run_workflow(url):
+            yield f"data: {json.dumps(item, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({'type': 'complete'}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        content_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache, no-transform", "Connection": "keep-alive"},
     )

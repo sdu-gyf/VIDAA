@@ -3,7 +3,7 @@ app:
   icon: 🤖
   icon_background: '#FFEAD5'
   mode: workflow
-  name: divaa
+  name: vidaa
   use_icon_as_answer_icon: false
 kind: app
 version: 0.1.5
@@ -96,6 +96,7 @@ workflow:
         sourceType: llm
         targetType: llm
       id: 1740039734537-source-1740040303092-target
+      selected: false
       source: '1740039734537'
       sourceHandle: source
       target: '1740040303092'
@@ -107,6 +108,7 @@ workflow:
         sourceType: parameter-extractor
         targetType: llm
       id: 1739521132152-source-17400405563060-target
+      selected: false
       source: '1739521132152'
       sourceHandle: source
       target: '17400405563060'
@@ -118,6 +120,7 @@ workflow:
         sourceType: llm
         targetType: parameter-extractor
       id: 1740039734537-source-1740040839740-target
+      selected: false
       source: '1740039734537'
       sourceHandle: source
       target: '1740040839740'
@@ -129,6 +132,7 @@ workflow:
         sourceType: llm
         targetType: parameter-extractor
       id: 17400405563060-source-17400408589150-target
+      selected: false
       source: '17400405563060'
       sourceHandle: source
       target: '17400408589150'
@@ -140,6 +144,7 @@ workflow:
         sourceType: llm
         targetType: parameter-extractor
       id: 1740040303092-source-17400408719720-target
+      selected: false
       source: '1740040303092'
       sourceHandle: source
       target: '17400408719720'
@@ -151,6 +156,7 @@ workflow:
         sourceType: parameter-extractor
         targetType: end
       id: 17400408719720-source-1740041221708-target
+      selected: false
       source: '17400408719720'
       sourceHandle: source
       target: '1740041221708'
@@ -162,6 +168,7 @@ workflow:
         sourceType: parameter-extractor
         targetType: end
       id: 1740040839740-source-1740041221708-target
+      selected: false
       source: '1740040839740'
       sourceHandle: source
       target: '1740041221708'
@@ -173,6 +180,7 @@ workflow:
         sourceType: parameter-extractor
         targetType: end
       id: 17400408589150-source-1740041221708-target
+      selected: false
       source: '17400408589150'
       sourceHandle: source
       target: '1740041221708'
@@ -195,11 +203,11 @@ workflow:
       height: 89
       id: '1738844366333'
       position:
-        x: 29.771780063733672
-        y: 248.5
+        x: 30
+        y: 257.5
       positionAbsolute:
-        x: 29.771780063733672
-        y: 248.5
+        x: 30
+        y: 257.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -211,7 +219,7 @@ workflow:
         provider_name: webscraper
         provider_type: builtin
         selected: false
-        title: get_article
+        title: 爬取文章
         tool_configurations:
           generate_summary: 0
           user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
@@ -227,10 +235,10 @@ workflow:
       id: '1739520491653'
       position:
         x: 334
-        y: 248.5
+        y: 257.5
       positionAbsolute:
         x: 334
-        y: 248.5
+        y: 257.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -260,8 +268,8 @@ workflow:
         - '1739520491653'
         - text
         reasoning_mode: prompt
-        selected: true
-        title: get_title_and_context
+        selected: false
+        title: 获取文章标题和内容
         type: parameter-extractor
         variables: []
         vision:
@@ -269,12 +277,12 @@ workflow:
       height: 97
       id: '1739521132152'
       position:
-        x: 774.7961335846443
-        y: 202.3325383957876
+        x: 638
+        y: 257.5
       positionAbsolute:
-        x: 774.7961335846443
-        y: 202.3325383957876
-      selected: true
+        x: 638
+        y: 257.5
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -302,7 +310,7 @@ workflow:
             \  \n\n## 输入格式：\n请提供完整的新闻文章作为输入。  \n\n## 输出格式：\n以**适合口播**的新闻稿形式输出，**简洁、生动、有感染力**，控制在**200字左右**。\
             \  \n\n以下是新闻内容\n{{#1739521132152.context#}}"
         selected: false
-        title: summarize_context
+        title: 生成口播稿
         type: llm
         variables: []
         vision:
@@ -310,11 +318,11 @@ workflow:
       height: 97
       id: '1740039734537'
       position:
-        x: 1093.9058498989639
-        y: 74.73324138039777
+        x: 942
+        y: 257.5
       positionAbsolute:
-        x: 1093.9058498989639
-        y: 74.73324138039777
+        x: 942
+        y: 257.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -339,12 +347,11 @@ workflow:
           text: "# 智能助手提示词\n\n## 角色设定：\n你是一位专业的内容分析助手，擅长从文本中提取关键信息，并优化其呈现方式。你的任务是根据口播稿的内容，每隔**5秒**提取一个适合作为**背景图**的**名词**，以增强视觉表达。\n\
             \n## 任务：\n从以下**一分钟左右的口播稿**中，按照**每5秒钟的文本量**，提取一个**核心名词**，该名词应能代表该时间段的主要信息，并适合作为背景图元素（如**股市、比特币、AI、芯片**等）。\n\
             \n## 关键要求：\n- **精准提取**：确保所选名词能够概括该时间段的主要内容。  \n- **信息简洁**：每个名词不超过**3个字**，必要时可使用常见缩写（如AI、NFT）。\
-            \  \n- **增强可视化**：优先选择**具体、直观**的词汇，便于背景图呈现。  \n- **符合节奏**：按照**5秒钟的文本量**进行划分，确保信息分布均匀。\
+            \  \n- **增强可视化**：优先选择**具体、直观**的词汇，便于背景图呈现，尽量不要抽象化的词汇。  \n- **符合节奏**：按照**5秒钟的文本量**进行划分，确保信息分布均匀。\
             \  \n\n## 输入格式：\n请提供完整的**一分钟左右的口播稿**作为输入。  \n\n## 输出格式：\n按**时间节点**提取名词，并以列表形式输出，例如：\
-            \  \n-  **股市**  , **比特币**  ，**AI**  ，**芯片**  \n（以此类推，每5秒一个名词）  \n\n以下是口播稿\n\
-            {{#1740039734537.text#}}"
+            \  股市 , 比特币，AI，芯片  \n（每5秒一个名词，只输出名词，不添加其他额外信息）  \n\n以下是口播稿\n{{#1740039734537.text#}}"
         selected: false
-        title: get_backgroud_keyword
+        title: 生成背景图关键字
         type: llm
         variables: []
         vision:
@@ -352,11 +359,11 @@ workflow:
       height: 97
       id: '1740040303092'
       position:
-        x: 1484.562641263802
-        y: 172.33253839578765
+        x: 1246
+        y: 257.5
       positionAbsolute:
-        x: 1484.562641263802
-        y: 172.33253839578765
+        x: 1246
+        y: 257.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -388,7 +395,7 @@ workflow:
             \  \n1. **首款 AI 机器人来了！业内评价两极分化**  \n2. **AI 机器人发布！科技突破还是噱头？**  \n3. **颠覆还是泡沫？全球首款\
             \ AI 机器人亮相！**  \n\n新闻稿标题：\n{{#1739521132152.title#}}"
         selected: false
-        title: summarize_title
+        title: 重生成标题
         type: llm
         variables: []
         vision:
@@ -396,11 +403,11 @@ workflow:
       height: 97
       id: '17400405563060'
       position:
-        x: 1103.4153721773043
-        y: 364.11425461664106
+        x: 1246
+        y: 531.5
       positionAbsolute:
-        x: 1103.4153721773043
-        y: 364.11425461664106
+        x: 1246
+        y: 531.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -429,7 +436,7 @@ workflow:
         - text
         reasoning_mode: prompt
         selected: false
-        title: get_summarized_context
+        title: 处理口播稿
         type: parameter-extractor
         variables: []
         vision:
@@ -437,11 +444,11 @@ workflow:
       height: 97
       id: '1740040839740'
       position:
-        x: 1458.8483555495163
-        y: 16.90396696721629
+        x: 1550
+        y: 394.5
       positionAbsolute:
-        x: 1458.8483555495163
-        y: 16.90396696721629
+        x: 1550
+        y: 394.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -466,7 +473,7 @@ workflow:
         - text
         reasoning_mode: prompt
         selected: false
-        title: get_summarized_title
+        title: 处理标题列表
         type: parameter-extractor
         variables: []
         vision:
@@ -474,11 +481,11 @@ workflow:
       height: 97
       id: '17400408589150'
       position:
-        x: 1441.9868007487328
-        y: 442.1996174100502
+        x: 1550
+        y: 531.5
       positionAbsolute:
-        x: 1441.9868007487328
-        y: 442.1996174100502
+        x: 1550
+        y: 531.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -486,6 +493,7 @@ workflow:
       width: 244
     - data:
         desc: ''
+        instruction: The input is several keywords, turn them into a list
         model:
           completion_params:
             temperature: 0.7
@@ -495,14 +503,14 @@ workflow:
         parameters:
         - description: The input is several keywords, turn them into a list
           name: keywords
-          required: false
+          required: true
           type: array[string]
         query:
         - '1740040303092'
         - text
         reasoning_mode: prompt
-        selected: false
-        title: get_keyword
+        selected: true
+        title: 处理背景图关键字列表
         type: parameter-extractor
         variables: []
         vision:
@@ -510,12 +518,12 @@ workflow:
       height: 97
       id: '17400408719720'
       position:
-        x: 1764.843943605876
-        y: 172.33253839578765
+        x: 1550
+        y: 257.5
       positionAbsolute:
-        x: 1764.843943605876
-        y: 172.33253839578765
-      selected: false
+        x: 1550
+        y: 257.5
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -541,17 +549,17 @@ workflow:
       height: 141
       id: '1740041221708'
       position:
-        x: 2223.414870296415
-        y: 178.93007794965212
+        x: 1854
+        y: 394.5
       positionAbsolute:
-        x: 2223.414870296415
-        y: 178.93007794965212
+        x: 1854
+        y: 394.5
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
     viewport:
-      x: -495.48892197367877
-      y: 324.85428906601265
-      zoom: 1.0610015965572788
+      x: 0
+      y: 0
+      zoom: 0.7
