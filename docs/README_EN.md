@@ -28,8 +28,8 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
 
 - **Video Generation**
   - [x] RSS feed fetching
-  - [ ] Topic analysis
-  - [ ] Copywriting generation
+  - [x] Topic analysis
+  - [x] Copywriting generation
   - [ ] Audio and subtitle file creation
   - [ ] Image generation
   - [ ] Video packaging
@@ -41,7 +41,7 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
 
 ### Front-End Capabilities
 
-- [ ] Manage and modify RSS feeds
+- [x] Manage and modify RSS feeds
 - [ ] Adjust model prompt settings
 - [ ] Provide a user-friendly interface for each step of video creation
 - [ ] Unified management of login status across video platforms
