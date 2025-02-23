@@ -31,7 +31,7 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
   - [x] Topic analysis
   - [x] Copywriting generation
   - [ ] Audio and subtitle file creation
-  - [ ] Image generation
+  - [ ] Image fetching (using [pexels](https://pexels.com))
   - [ ] Video packaging
 - **Video Distribution**
   - [ ] Douyin
