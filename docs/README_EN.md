@@ -30,8 +30,8 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
   - [x] RSS feed fetching
   - [x] Topic analysis
   - [x] Copywriting generation
-  - [ ] Audio and subtitle file creation
-  - [ ] Image fetching (using [pexels](https://pexels.com))
+  - [x] Audio and subtitle file creation
+  - [x] Image fetching (using [pexels](https://pexels.com))
   - [ ] Video packaging
 - **Video Distribution**
   - [ ] Douyin

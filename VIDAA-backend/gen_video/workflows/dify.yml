@@ -119,18 +119,6 @@ workflow:
         isInIteration: false
         sourceType: llm
         targetType: parameter-extractor
-      id: 1740039734537-source-1740040839740-target
-      selected: false
-      source: '1740039734537'
-      sourceHandle: source
-      target: '1740040839740'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        sourceType: llm
-        targetType: parameter-extractor
       id: 17400405563060-source-17400408589150-target
       selected: false
       source: '17400405563060'
@@ -167,18 +155,6 @@ workflow:
         isInIteration: false
         sourceType: parameter-extractor
         targetType: end
-      id: 1740040839740-source-1740041221708-target
-      selected: false
-      source: '1740040839740'
-      sourceHandle: source
-      target: '1740041221708'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        sourceType: parameter-extractor
-        targetType: end
       id: 17400408589150-source-1740041221708-target
       selected: false
       source: '17400408589150'
@@ -204,10 +180,10 @@ workflow:
       id: '1738844366333'
       position:
         x: 30
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 30
-        y: 257.5
+        y: 270.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -235,10 +211,10 @@ workflow:
       id: '1739520491653'
       position:
         x: 334
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 334
-        y: 257.5
+        y: 270.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -278,10 +254,10 @@ workflow:
       id: '1739521132152'
       position:
         x: 638
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 638
-        y: 257.5
+        y: 270.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -304,12 +280,13 @@ workflow:
         - id: e6cb2224-10bf-417f-86a3-18563abdc9fa
           role: system
           text: "# 智能助手提示词\n\n## 角色设定：\n你是一位专业的内容改写助手，擅长将新闻文章转换为**适合口播**的新闻稿，使其更加生动、有吸引力，并适用于视频或音频播报。\n\
-            \n## 任务：\n请将以下新闻文章改写为**一分钟左右的口播稿**（约200字）。如果原文较短，仅调整表达方式，不额外补充信息。**避免涉及政治敏感内容**，但需确保新闻具有吸引力和传播价值。\n\
+            \n## 任务：\n请将以下新闻文章改写为**约300字的口播稿**。如果原文较短，仅调整表达方式，不额外补充信息。**避免涉及政治敏感内容**，但需确保新闻具有吸引力和传播价值。\n\
             \n## 关键要求：\n- **口语化表达**：使用自然流畅的语言，让主播朗读时更有代入感。  \n- **吸引注意**：突出新闻爆点，增强悬念或冲击力，让观众愿意听下去。\
             \  \n- **信息精准**：忠实于原新闻，不夸大、不歪曲，确保事实准确。  \n- **结构清晰**：适当使用短句，优化停顿，提升可听性和节奏感。\
-            \  \n\n## 输入格式：\n请提供完整的新闻文章作为输入。  \n\n## 输出格式：\n以**适合口播**的新闻稿形式输出，**简洁、生动、有感染力**，控制在**200字左右**。\
-            \  \n\n以下是新闻内容\n{{#1739521132152.context#}}"
-        selected: false
+            \  \n- **严格控制字数**：**最终稿件需在280-320字之间**，确保既完整表达信息，又适合口播节奏。  \n\n## 输入格式：\n\
+            请提供完整的新闻文章作为输入。  \n\n## 输出格式：\n以**适合口播**的新闻稿形式输出，**简洁、生动、有感染力**，**严格控制字数在280-320字之间**。\
+            \  \n\n以下是新闻内容：\n{{#1739521132152.context#}}"
+        selected: true
         title: 生成口播稿
         type: llm
         variables: []
@@ -319,11 +296,11 @@ workflow:
       id: '1740039734537'
       position:
         x: 942
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 942
-        y: 257.5
-      selected: false
+        y: 270.5
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -360,10 +337,10 @@ workflow:
       id: '1740040303092'
       position:
         x: 1246
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 1246
-        y: 257.5
+        y: 270.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -404,51 +381,10 @@ workflow:
       id: '17400405563060'
       position:
         x: 1246
-        y: 531.5
+        y: 407.5
       positionAbsolute:
         x: 1246
-        y: 531.5
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: ''
-        instruction: The input is an abstract of an article, but there may be some
-          redundant information. Only the abstract is kept and unnecessary information
-          is removed.
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: qwen-turbo-latest
-          provider: tongyi
-        parameters:
-        - description: The input is an abstract of an article, but there may be some
-            redundant information. Only the abstract is kept and unnecessary information
-            is removed.
-          name: context
-          required: true
-          type: string
-        query:
-        - '1740039734537'
-        - text
-        reasoning_mode: prompt
-        selected: false
-        title: 处理口播稿
-        type: parameter-extractor
-        variables: []
-        vision:
-          enabled: false
-      height: 97
-      id: '1740040839740'
-      position:
-        x: 1550
-        y: 394.5
-      positionAbsolute:
-        x: 1550
-        y: 394.5
+        y: 407.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -482,10 +418,10 @@ workflow:
       id: '17400408589150'
       position:
         x: 1550
-        y: 531.5
+        y: 407.5
       positionAbsolute:
         x: 1550
-        y: 531.5
+        y: 407.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -509,7 +445,7 @@ workflow:
         - '1740040303092'
         - text
         reasoning_mode: prompt
-        selected: true
+        selected: false
         title: 处理背景图关键字列表
         type: parameter-extractor
         variables: []
@@ -519,11 +455,11 @@ workflow:
       id: '17400408719720'
       position:
         x: 1550
-        y: 257.5
+        y: 270.5
       positionAbsolute:
         x: 1550
-        y: 257.5
-      selected: true
+        y: 270.5
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -536,8 +472,8 @@ workflow:
           - title
           variable: title_list
         - value_selector:
-          - '1740040839740'
-          - context
+          - '1740039734537'
+          - text
           variable: context
         - value_selector:
           - '17400408719720'
@@ -550,16 +486,16 @@ workflow:
       id: '1740041221708'
       position:
         x: 1854
-        y: 394.5
+        y: 270.5
       positionAbsolute:
         x: 1854
-        y: 394.5
+        y: 270.5
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
     viewport:
-      x: 0
+      x: 5
       y: 0
       zoom: 0.7

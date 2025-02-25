@@ -3,6 +3,8 @@ import { Article } from '../../types/article';
 import { Button } from '@heroui/react';
 import { getApiUrl } from '../../constants/api';
 import { useVideoConfig } from '../../contexts/VideoConfigContext';
+import { useClickAway } from 'react-use';
+import { useRef } from 'react';
 
 interface VideoConfigListProps {
   articles: Article[];
@@ -24,6 +26,7 @@ interface StreamData {
   };
   error?: string;
   timestamp?: number;
+  selectedTitle?: string;
 }
 
 interface ArticleConfigs {
@@ -33,6 +36,24 @@ interface ArticleConfigs {
 export function VideoConfigList({ articles }: VideoConfigListProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { articleConfigs, setArticleConfigs } = useVideoConfig();
+
+  const [editingContext, setEditingContext] = useState<string | null>(null);
+  const [editingTitleIndex, setEditingTitleIndex] = useState<{articleLink: string, index: number} | null>(null);
+
+  const contextRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  useClickAway(contextRef, () => {
+    if (editingContext !== null) {
+      handleContextUpdate();
+    }
+  });
+
+  useClickAway(titleRef, () => {
+    if (editingTitleIndex !== null) {
+      handleTitleUpdate();
+    }
+  });
 
   // Reconnect to EventSource for any articles that were in progress
   useEffect(() => {
@@ -133,9 +154,19 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
       loading,
       latestData,
       isCompleted,
-      finalData,
+      finalData: finalData as StreamData | null,
       allData: data
     };
+  };
+
+  const getFinalData = (article: Article) => {
+    const status = getArticleStatus(article);
+    return status?.finalData?.outputs;
+  };
+
+  const getSelectedTitle = (article: Article) => {
+    const status = getArticleStatus(article);
+    return status?.finalData?.selectedTitle;
   };
 
   const getStatusColor = (article: Article) => {
@@ -143,6 +174,47 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
     if (!status) return 'bg-gray-300';
     if (!status.isCompleted) return status.loading ? 'bg-blue-500' : 'bg-gray-300';
     return status.finalData?.status === 'succeeded' ? 'bg-green-500' : 'bg-red-500';
+  };
+
+  const getFinalError = (article: Article) => {
+    const status = getArticleStatus(article);
+    return status?.finalData?.error;
+  };
+
+  const handleContextUpdate = () => {
+    const article = articles.find(a => a.link === editingTitleIndex?.articleLink);
+    if (!article || editingContext === null) return;
+
+    setArticleConfigs(prev => ({
+      ...prev,
+      [article.link]: {
+        ...prev[article.link],
+        data: prev[article.link].data.map(d =>
+          d.status === 'succeeded' ? {
+            ...d,
+            outputs: { ...d.outputs, context: editingContext }
+          } : d
+        )
+      }
+    }));
+    setEditingContext(null);
+  };
+
+  const handleTitleUpdate = () => {
+    if (!editingTitleIndex) return;
+    setEditingTitleIndex(null);
+  };
+
+  const handleTitleSelect = (article: Article, title: string) => {
+    setArticleConfigs(prev => ({
+      ...prev,
+      [article.link]: {
+        ...prev[article.link],
+        data: prev[article.link].data.map(d =>
+          d.status === 'succeeded' ? { ...d, selectedTitle: title } : d
+        )
+      }
+    }));
   };
 
   return (
@@ -242,27 +314,96 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
 
               {getArticleStatus(article) && (
                 <div className="space-y-4">
-                  {getArticleStatus(article)?.finalData?.outputs && (
+                  {getFinalData(article) && (
                     <div className="bg-white rounded-lg border p-4 space-y-6">
-                      {getArticleStatus(article)?.finalData.outputs.context && (
+                      {getFinalData(article)?.context && (
                         <div className="space-y-2">
                           <h4 className="font-medium text-gray-700">口播稿</h4>
-                          <div className="p-4 bg-gray-50 rounded-lg text-gray-600 whitespace-pre-wrap">
-                            {getArticleStatus(article)?.finalData.outputs.context}
+                          <div
+                            ref={contextRef}
+                            className="relative"
+                            onClick={() => {
+                              const context = getFinalData(article)?.context || '';
+                              setEditingContext(context);
+                            }}
+                          >
+                            <div className="w-full p-4 bg-gray-50 rounded-lg text-gray-600">
+                              <div className={`whitespace-pre-wrap ${editingContext !== null ? 'invisible' : ''}`}>
+                                {getFinalData(article)?.context}
+                              </div>
+                              {editingContext !== null && (
+                                <textarea
+                                  className="absolute inset-0 w-full h-full p-4 bg-transparent border focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none rounded-lg"
+                                  value={editingContext}
+                                  onChange={(e) => setEditingContext(e.target.value)}
+                                  autoFocus
+                                  style={{
+                                    overflowY: 'auto'
+                                  }}
+                                />
+                              )}
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      {getArticleStatus(article)?.finalData.outputs.title_list && getArticleStatus(article)?.finalData.outputs.title_list.length > 0 && (
+                      {getFinalData(article)?.title_list?.length > 0 && (
                         <div className="space-y-2">
                           <h4 className="font-medium text-gray-700">待选标题</h4>
-                          <div className="space-y-2">
-                            {getArticleStatus(article)?.finalData.outputs.title_list.map((title, index) => (
+                          <div ref={titleRef} className="space-y-2">
+                            {getFinalData(article)?.title_list?.map((title, index) => (
                               <div
                                 key={index}
-                                className="p-3 bg-gray-50 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                                className={`group flex items-center justify-between p-3 rounded-lg text-gray-600 cursor-pointer transition-colors ${
+                                  title === getSelectedTitle(article)
+                                    ? 'bg-blue-50 border-2 border-blue-500'
+                                    : 'bg-gray-50 hover:bg-gray-100'
+                                }`}
                               >
-                                {title}
+                                {editingTitleIndex?.articleLink === article.link &&
+                                 editingTitleIndex.index === index ? (
+                                  <input
+                                    className="flex-1 bg-transparent border-none focus:ring-0 text-gray-600"
+                                    value={title}
+                                    onChange={(e) => {
+                                      const newTitles = [...(getFinalData(article)?.title_list || [])];
+                                      newTitles[index] = e.target.value;
+                                      setArticleConfigs(prev => ({
+                                        ...prev,
+                                        [article.link]: {
+                                          ...prev[article.link],
+                                          data: prev[article.link].data.map(d =>
+                                            d.status === 'succeeded' ? {
+                                              ...d,
+                                              outputs: { ...d.outputs, title_list: newTitles }
+                                            } : d
+                                          )
+                                        }
+                                      }));
+                                    }}
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <>
+                                    <div
+                                      className="flex-1"
+                                      onClick={() => handleTitleSelect(article, title)}
+                                    >
+                                      {title}
+                                    </div>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingTitleIndex({ articleLink: article.link, index });
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 ml-2 p-1 hover:bg-gray-200 rounded transition-opacity"
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                      </svg>
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -272,8 +413,8 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                       <div className="space-y-2">
                         <h4 className="font-medium text-gray-700">背景图关键字</h4>
                         <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg">
-                          {getArticleStatus(article)?.finalData.outputs.keywords && getArticleStatus(article)?.finalData.outputs.keywords.length > 0 ? (
-                            getArticleStatus(article)?.finalData.outputs.keywords.map((keyword, index) => (
+                          {(getFinalData(article)?.keywords?.length ?? 0) > 0 ? (
+                            getFinalData(article)?.keywords?.map((keyword, index) => (
                               <span
                                 key={index}
                                 className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
@@ -292,7 +433,7 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                   )}
 
                   {getArticleStatus(article)?.finalData?.status === 'failed' &&
-                   getArticleStatus(article)?.finalData?.error && (
+                   getFinalError(article) && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <div className="flex items-center gap-2 text-red-600 font-medium mb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -301,7 +442,7 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                         处理失败
                       </div>
                       <div className="text-red-700 bg-red-100 rounded p-3 font-mono text-sm">
-                        {getArticleStatus(article)?.finalData.error}
+                        {getFinalError(article)}
                       </div>
                     </div>
                   )}
