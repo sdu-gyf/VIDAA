@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Article } from '../../types/article';
 import { Button } from '@heroui/react';
 import { getApiUrl } from '../../constants/api';
 import { useVideoConfig } from '../../contexts/VideoConfigContext';
 import { useClickAway } from 'react-use';
 import { useRef } from 'react';
+import { ErrorDisplay } from '../common/ErrorDisplay';
 
 interface VideoConfigListProps {
   articles: Article[];
@@ -88,43 +89,75 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
         }
       }));
 
-      eventSource.onmessage = (event) => {
-        const newData: StreamData = {
-          ...JSON.parse(event.data),
-          timestamp: Date.now()
-        };
-
-        setArticleConfigs(prev => {
-          const existingData = prev[article.link]?.data || [];
-          const isDuplicate = existingData.some(
-            item => item.title === newData.title && item.status === newData.status
-          );
-
-          return {
+      // Set a timeout to check if the connection has failed
+      const connectionTimeout = setTimeout(() => {
+        if (articleConfigs[article.link]?.loading && !articleConfigs[article.link]?.data.length) {
+          eventSource.close();
+          setArticleConfigs(prev => ({
             ...prev,
             [article.link]: {
               ...prev[article.link],
-              data: isDuplicate ? existingData : [...existingData, newData]
+              loading: false,
+              error: 'Backend connection timeout. Please try again later.'
             }
+          }));
+        }
+      }, 10000); // 10 seconds timeout
+
+      eventSource.onmessage = (event) => {
+        try {
+          const newData: StreamData = {
+            ...JSON.parse(event.data),
+            timestamp: Date.now()
           };
-        });
+
+          // Log the event data to debug
+          console.log('Received EventSource data:', newData);
+
+          // Check if this is an error response
+          const isError = newData.status === 'failed';
+
+          setArticleConfigs(prev => {
+            const existingData = prev[article.link]?.data || [];
+            const isDuplicate = existingData.some(
+              item => item.title === newData.title && item.status === newData.status
+            );
+
+            return {
+              ...prev,
+              [article.link]: {
+                ...prev[article.link],
+                data: isDuplicate ? existingData : [...existingData, newData],
+                loading: !isError, // Stop loading if we got an error
+              }
+            };
+          });
+        } catch (e) {
+          console.error('Error parsing EventSource data:', e);
+        }
       };
 
       eventSource.onerror = (error) => {
         console.error('EventSource error:', error);
         eventSource.close();
+        clearTimeout(connectionTimeout);
+
+        // We shouldn't hardcode the error message here
+        // The actual error will come through the message event with status="failed"
         setArticleConfigs(prev => ({
           ...prev,
           [article.link]: {
             ...prev[article.link],
-            loading: false,
-            error: 'Failed to get configuration'
+            loading: false
+            // Don't set an error here, let the error come from the event data
           }
         }));
       };
 
       eventSource.addEventListener('complete', () => {
         eventSource.close();
+        clearTimeout(connectionTimeout);
+
         setArticleConfigs(prev => ({
           ...prev,
           [article.link]: {
@@ -134,30 +167,53 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
         }));
       });
 
+      return () => {
+        clearTimeout(connectionTimeout);
+        eventSource.close();
+      };
+
     } catch (error) {
       console.error('Error setting up EventSource:', error);
+      setArticleConfigs(prev => ({
+        ...prev,
+        [article.link]: {
+          ...prev[article.link],
+          loading: false,
+          error: 'Failed to initialize connection to backend service.'
+        }
+      }));
     }
   };
 
-  const getArticleStatus = (article: Article) => {
+  const getArticleStatus = useCallback((article: Article) => {
     const config = articleConfigs[article.link];
     if (!config) return null;
 
-    const { data, loading } = config;
+    const { data, loading, error: configError } = config;
     const latestData = data[data.length - 1];
     const isCompleted = data.some(d => d.title === '结束' && d.status === 'completed');
-    const finalData = isCompleted ? data.find(d =>
-      d.status === 'succeeded' || d.status === 'failed'
-    ) : null;
+
+    // Find the error data or success data regardless of completion status
+    const errorData = data.find(d => d.status === 'failed');
+    const successData = data.find(d => d.status === 'succeeded');
+
+    // Final data is either the error data or the success data
+    const finalData = errorData || (isCompleted ? successData : null);
+
+    // We have an error if we have config error or a failed status message
+    const hasError = configError !== null || errorData !== undefined;
 
     return {
       loading,
       latestData,
       isCompleted,
       finalData: finalData as StreamData | null,
-      allData: data
+      allData: data,
+      hasError,
+      configError,
+      errorData
     };
-  };
+  }, [articleConfigs]);
 
   const getFinalData = (article: Article) => {
     const status = getArticleStatus(article);
@@ -172,13 +228,41 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
   const getStatusColor = (article: Article) => {
     const status = getArticleStatus(article);
     if (!status) return 'bg-gray-300';
+
+    if (status.hasError) return 'bg-red-500';
     if (!status.isCompleted) return status.loading ? 'bg-blue-500' : 'bg-gray-300';
     return status.finalData?.status === 'succeeded' ? 'bg-green-500' : 'bg-red-500';
   };
 
   const getFinalError = (article: Article) => {
     const status = getArticleStatus(article);
-    return status?.finalData?.error;
+    if (!status) return null;
+
+    // First check for configuration errors
+    if (status.configError) {
+      return status.configError;
+    }
+
+    // If no final data, we can't extract specific error
+    if (!status.finalData) return null;
+
+    // If there's an error message directly in the finalData, return that
+    if (status.finalData.error) {
+      return status.finalData.error;
+    }
+
+    // Otherwise check for errors in the outputs
+    return status.finalData.outputs?.error || null;
+  };
+
+  const getStatusText = (article: Article) => {
+    const status = getArticleStatus(article);
+    if (!status) return 'Waiting to start';
+
+    if (status.hasError) return 'Error occurred';
+    if (status.loading) return 'Processing...';
+    if (status.isCompleted) return 'Completed';
+    return status.latestData?.status || 'Waiting to start';
   };
 
   const handleContextUpdate = () => {
@@ -236,11 +320,11 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                     getArticleStatus(article)?.loading ? 'animate-pulse' : ''
                   }`} />
                   <span className="text-sm text-gray-600">
-                    {getArticleStatus(article)?.loading ? 'Processing...' :
-                     getArticleStatus(article)?.isCompleted ? 'Completed' :
-                     getArticleStatus(article)?.latestData?.status || 'Waiting to start'}
+                    {getStatusText(article)}
                   </span>
-                  {getArticleStatus(article)?.latestData?.title && !getArticleStatus(article)?.isCompleted && (
+                  {getArticleStatus(article)?.latestData?.title &&
+                   !getArticleStatus(article)?.isCompleted &&
+                   !getArticleStatus(article)?.hasError && (
                     <span className="text-sm text-gray-500">• {getArticleStatus(article)?.latestData?.title}</span>
                   )}
                 </div>
@@ -432,20 +516,17 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                     </div>
                   )}
 
-                  {getArticleStatus(article)?.finalData?.status === 'failed' &&
-                   getFinalError(article) && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-red-600 font-medium mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        处理失败
-                      </div>
-                      <div className="text-red-700 bg-red-100 rounded p-3 font-mono text-sm">
-                        {getFinalError(article)}
-                      </div>
-                    </div>
-                  )}
+                  {((getArticleStatus(article)?.hasError) &&
+                    (getFinalError(article) || articleConfigs[article.link]?.error)) ? (
+                    <>
+                      {console.log('Error to display:', getFinalError(article) || articleConfigs[article.link]?.error)}
+                      <ErrorDisplay
+                        message={getFinalError(article) || articleConfigs[article.link]?.error || 'Unknown error occurred'}
+                        onRetry={() => handleGetConfig(article)}
+                        title="处理失败"
+                      />
+                    </>
+                  ) : null}
 
                   {!getArticleStatus(article)?.finalData && (
                     <div className="text-center text-gray-500 py-8">

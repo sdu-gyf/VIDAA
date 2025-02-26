@@ -69,30 +69,6 @@ workflow:
       zIndex: 0
     - data:
         isInIteration: false
-        sourceType: tool
-        targetType: parameter-extractor
-      id: 1739520491653-source-1739521132152-target
-      selected: false
-      source: '1739520491653'
-      sourceHandle: source
-      target: '1739521132152'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        sourceType: parameter-extractor
-        targetType: llm
-      id: 1739521132152-source-1740039734537-target
-      selected: false
-      source: '1739521132152'
-      sourceHandle: source
-      target: '1740039734537'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
         sourceType: llm
         targetType: llm
       id: 1740039734537-source-1740040303092-target
@@ -105,11 +81,32 @@ workflow:
       zIndex: 0
     - data:
         isInIteration: false
-        sourceType: parameter-extractor
+        sourceType: tool
+        targetType: code
+      id: 1739520491653-source-1740552757378-target
+      source: '1739520491653'
+      sourceHandle: source
+      target: '1740552757378'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
         targetType: llm
-      id: 1739521132152-source-17400405563060-target
-      selected: false
-      source: '1739521132152'
+      id: 1740552757378-source-1740039734537-target
+      source: '1740552757378'
+      sourceHandle: source
+      target: '1740039734537'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: llm
+      id: 1740552757378-source-17400405563060-target
+      source: '1740552757378'
       sourceHandle: source
       target: '17400405563060'
       targetHandle: target
@@ -118,34 +115,20 @@ workflow:
     - data:
         isInIteration: false
         sourceType: llm
-        targetType: parameter-extractor
-      id: 17400405563060-source-17400408589150-target
-      selected: false
-      source: '17400405563060'
-      sourceHandle: source
-      target: '17400408589150'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        sourceType: llm
-        targetType: parameter-extractor
-      id: 1740040303092-source-17400408719720-target
-      selected: false
+        targetType: code
+      id: 1740040303092-source-1740554519569-target
       source: '1740040303092'
       sourceHandle: source
-      target: '17400408719720'
+      target: '1740554519569'
       targetHandle: target
       type: custom
       zIndex: 0
     - data:
         isInIteration: false
-        sourceType: parameter-extractor
+        sourceType: code
         targetType: end
-      id: 17400408719720-source-1740041221708-target
-      selected: false
-      source: '17400408719720'
+      id: 1740554519569-source-1740041221708-target
+      source: '1740554519569'
       sourceHandle: source
       target: '1740041221708'
       targetHandle: target
@@ -153,11 +136,21 @@ workflow:
       zIndex: 0
     - data:
         isInIteration: false
-        sourceType: parameter-extractor
+        sourceType: llm
+        targetType: code
+      id: 17400405563060-source-1740555358796-target
+      source: '17400405563060'
+      sourceHandle: source
+      target: '1740555358796'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
         targetType: end
-      id: 17400408589150-source-1740041221708-target
-      selected: false
-      source: '17400408589150'
+      id: 1740555358796-source-1740041221708-target
+      source: '1740555358796'
       sourceHandle: source
       target: '1740041221708'
       targetHandle: target
@@ -221,54 +214,11 @@ workflow:
       type: custom
       width: 244
     - data:
-        desc: ''
-        instruction: 'context：get all chinese context
-
-          title: get title from article'
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: qwen-plus
-          provider: tongyi
-        parameters:
-        - description: get all chinese context
-          name: context
-          required: true
-          type: string
-        - description: get title from article
-          name: title
-          required: true
-          type: string
-        query:
-        - '1739520491653'
-        - text
-        reasoning_mode: prompt
-        selected: false
-        title: 获取文章标题和内容
-        type: parameter-extractor
-        variables: []
-        vision:
-          enabled: false
-      height: 97
-      id: '1739521132152'
-      position:
-        x: 638
-        y: 270.5
-      positionAbsolute:
-        x: 638
-        y: 270.5
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
         context:
           enabled: true
           variable_selector:
-          - '1739521132152'
-          - context
+          - '1740552757378'
+          - content
         desc: ''
         model:
           completion_params:
@@ -285,8 +235,8 @@ workflow:
             \  \n- **信息精准**：忠实于原新闻，不夸大、不歪曲，确保事实准确。  \n- **结构清晰**：适当使用短句，优化停顿，提升可听性和节奏感。\
             \  \n- **严格控制字数**：**最终稿件需在280-320字之间**，确保既完整表达信息，又适合口播节奏。  \n\n## 输入格式：\n\
             请提供完整的新闻文章作为输入。  \n\n## 输出格式：\n以**适合口播**的新闻稿形式输出，**简洁、生动、有感染力**，**严格控制字数在280-320字之间**。\
-            \  \n\n以下是新闻内容：\n{{#1739521132152.context#}}"
-        selected: true
+            \  \n\n以下是新闻内容：\n{{#1740552757378.content#}}"
+        selected: false
         title: 生成口播稿
         type: llm
         variables: []
@@ -300,7 +250,7 @@ workflow:
       positionAbsolute:
         x: 942
         y: 270.5
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -350,7 +300,7 @@ workflow:
         context:
           enabled: true
           variable_selector:
-          - '1739521132152'
+          - '1740552757378'
           - title
         desc: ''
         model:
@@ -366,11 +316,10 @@ workflow:
             \n## 任务：\n请根据以下**新闻稿标题**，改写为**适合视频新闻的标题**，确保能够吸引观众点击，同时不失准确性和专业性。\n\n\
             ## 关键要求：\n- **突出爆点**：提炼新闻中最具吸引力的核心信息，使标题更具冲击力。  \n- **避免夸大**：确保标题忠实于新闻内容，不制造误导或夸张表述。\
             \  \n- **简洁有力**：控制在**15字以内**，使用短句或关键词组合提升可读性。  \n- **适应视频风格**：可以加入**悬念、对比、数字、热点词**等元素，以增强传播效果。\
-            \  \n\n## 输入格式：\n新闻稿标题：  \n`[原始新闻标题]`  \n\n## 输出格式：\n视频新闻标题优化方案：  \n1.\
-            \ **[优化后的视频新闻标题]**  \n2. **[备选标题1]**  \n3. **[备选标题2]**  \n\n## 示例：\n###\
-            \ 输入：\n新闻稿标题：  \n`全球首款 AI 机器人正式发布，业内评价褒贬不一`  \n\n### 输出：\n视频新闻标题优化方案：\
-            \  \n1. **首款 AI 机器人来了！业内评价两极分化**  \n2. **AI 机器人发布！科技突破还是噱头？**  \n3. **颠覆还是泡沫？全球首款\
-            \ AI 机器人亮相！**  \n\n新闻稿标题：\n{{#1739521132152.title#}}"
+            \  \n\n## 输入格式：\n新闻稿标题：  \n`[原始新闻标题]`  \n\n## 输出格式：\n《优化后的视频新闻标题》，《备选标题1》，《备选标题2》\n\
+            \n## 示例：\n### 输入：\n新闻稿标题：  \n`全球首款 AI 机器人正式发布，业内评价褒贬不一`  \n\n### 输出：\n\
+            《首款 AI 机器人来了！业内评价两极分化》，《AI 机器人发布！科技突破还是噱头？》，《颠覆还是泡沫？全球首款 AI 机器人亮相！》\n\n\
+            新闻稿标题：\n{{#1740552757378.title#}}"
         selected: false
         title: 重生成标题
         type: llm
@@ -392,91 +341,17 @@ workflow:
       width: 244
     - data:
         desc: ''
-        instruction: The input is several titles, turn them into a list
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: qwen-turbo-latest
-          provider: tongyi
-        parameters:
-        - description: The input is several titles, turn them into a list
-          name: title
-          required: true
-          type: array[string]
-        query:
-        - '17400405563060'
-        - text
-        reasoning_mode: prompt
-        selected: false
-        title: 处理标题列表
-        type: parameter-extractor
-        variables: []
-        vision:
-          enabled: false
-      height: 97
-      id: '17400408589150'
-      position:
-        x: 1550
-        y: 407.5
-      positionAbsolute:
-        x: 1550
-        y: 407.5
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: ''
-        instruction: The input is several keywords, turn them into a list
-        model:
-          completion_params:
-            temperature: 0.7
-          mode: chat
-          name: qwen-turbo-latest
-          provider: tongyi
-        parameters:
-        - description: The input is several keywords, turn them into a list
-          name: keywords
-          required: true
-          type: array[string]
-        query:
-        - '1740040303092'
-        - text
-        reasoning_mode: prompt
-        selected: false
-        title: 处理背景图关键字列表
-        type: parameter-extractor
-        variables: []
-        vision:
-          enabled: false
-      height: 97
-      id: '17400408719720'
-      position:
-        x: 1550
-        y: 270.5
-      positionAbsolute:
-        x: 1550
-        y: 270.5
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: ''
         outputs:
         - value_selector:
-          - '17400408589150'
-          - title
+          - '1740555358796'
+          - titles
           variable: title_list
         - value_selector:
           - '1740039734537'
           - text
           variable: context
         - value_selector:
-          - '17400408719720'
+          - '1740554519569'
           - keywords
           variable: keywords
         selected: false
@@ -495,7 +370,113 @@ workflow:
       targetPosition: left
       type: custom
       width: 244
+    - data:
+        code: "import re\n\ndef main(input: str, url: str) -> dict:\n    input = input.replace(\"\
+          \\n\", \"\")\n    title = re.search(r\"TITLE: (.*)\", input)\n    content\
+          \ = re.search(r\"TEXT:\\s*([\\s\\S]*)\", input)\n    if title:\n       \
+          \ title = title.group(1).split(\"AUTHORS\")[0]\n    else:\n        title\
+          \ = \"\"\n    if content:\n        content = content.group(1)\n        \n\
+          \    else:\n        content = \"\"\n    if \"https://cn.nytimes.com\" in\
+          \ url:\n        content = re.findall(r\"[\\u4e00-\\u9fa5，。！？《》“”]+\", content)\n\
+          \        content = \"\".join(content)\n        return {\"title\": title,\
+          \ \"content\": content}\n    elif \"http://china.chinadaily.com.cn\" in\
+          \ url:\n        return {\"title\": title, \"content\": content}"
+        code_language: python3
+        desc: ''
+        outputs:
+          content:
+            children: null
+            type: string
+          title:
+            children: null
+            type: string
+        selected: true
+        title: 清洗文章
+        type: code
+        variables:
+        - value_selector:
+          - '1738844366333'
+          - input
+          variable: url
+        - value_selector:
+          - '1739520491653'
+          - text
+          variable: input
+      height: 53
+      id: '1740552757378'
+      position:
+        x: 638
+        y: 270.5
+      positionAbsolute:
+        x: 638
+        y: 270.5
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "def main(keyword: str) -> list:\n    # dify limits output length to\
+          \ 30\n    return {\n        \"keywords\": keyword.replace(\" \", \"\").replace(\"\
+          \\n\", \"\").split(\",\")[:30]\n    }"
+        code_language: python3
+        desc: ''
+        outputs:
+          keywords:
+            children: null
+            type: array[string]
+        selected: false
+        title: 清洗背景关键字
+        type: code
+        variables:
+        - value_selector:
+          - '1740040303092'
+          - text
+          variable: keyword
+      height: 53
+      id: '1740554519569'
+      position:
+        x: 1550
+        y: 270.5
+      positionAbsolute:
+        x: 1550
+        y: 270.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import re\ndef main(title: str) -> list:\n    return {\n        \"\
+          titles\": re.findall(r\"《(.*?)》\", title)\n    }"
+        code_language: python3
+        desc: ''
+        outputs:
+          titles:
+            children: null
+            type: array[string]
+        selected: false
+        title: 清洗标题
+        type: code
+        variables:
+        - value_selector:
+          - '17400405563060'
+          - text
+          variable: title
+      height: 53
+      id: '1740555358796'
+      position:
+        x: 1550
+        y: 407.5
+      positionAbsolute:
+        x: 1550
+        y: 407.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
     viewport:
-      x: 5
+      x: 0
       y: 0
       zoom: 0.7

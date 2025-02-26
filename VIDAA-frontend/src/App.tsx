@@ -1,13 +1,21 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HeroUIProvider } from '@heroui/react'
+
+// Layouts
 import { MainLayout } from './components/layout/MainLayout'
 import { GenVideoLayout } from './components/layout/GenVideoLayout'
+
+// Pages
 import { HomePage } from './pages/Home'
 import { GenVideoPage } from './pages/GenVideo'
 import { ComingSoonPage } from './pages/ComingSoon'
 import { NotFoundPage } from './pages/NotFound'
-import "./styles/animations.css"
+
+// Contexts
 import { VideoConfigProvider } from './contexts/VideoConfigContext'
+
+// Styles
+import "./styles/animations.css"
 
 function App() {
   return (

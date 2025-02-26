@@ -15,21 +15,12 @@ export function useEventSource<T>(url: string, options = { useCache: true }) {
     setError(null);
   }, []);
 
-  const reconnect = useCallback(() => {
-    reset();
-    serviceRef.current?.disconnect();
-    serviceRef.current = new EventSourceService<T>(url);
-    connect();
-  }, [url, reset]);
-
   const connect = useCallback(() => {
     if (!serviceRef.current || !url) return;
-    console.log('Connecting to EventSource:', url);
 
     setLoading(true);
     serviceRef.current.connect({
       onMessage: (newData) => {
-        console.log('Received message:', newData);
         setData(prev => {
           const newDataArray = [...prev, newData];
           if (options.useCache) {
@@ -38,17 +29,20 @@ export function useEventSource<T>(url: string, options = { useCache: true }) {
           return newDataArray;
         });
       },
-      onComplete: () => {
-        console.log('EventSource completed');
-        setLoading(false);
-      },
+      onComplete: () => setLoading(false),
       onError: (err) => {
-        console.error('EventSource error:', err);
         setError(err);
         setLoading(false);
       }
     });
   }, [url, options.useCache]);
+
+  const reconnect = useCallback(() => {
+    reset();
+    serviceRef.current?.disconnect();
+    serviceRef.current = new EventSourceService<T>(url);
+    connect();
+  }, [url, reset, connect]);
 
   useEffect(() => {
     if (!url) {
@@ -65,26 +59,14 @@ export function useEventSource<T>(url: string, options = { useCache: true }) {
       }
     }
 
-    console.log('Setting up EventSource for URL:', url);
     reset();
     serviceRef.current = new EventSourceService<T>(url);
     connect();
 
-    return () => {
-      console.log('Cleaning up EventSource');
-      serviceRef.current?.disconnect();
-    };
+    return () => serviceRef.current?.disconnect();
   }, [url, connect, reset, options.useCache]);
 
-  const clearCache = useCallback(() => {
-    cache.remove(url);
-  }, [url]);
+  const clearCache = useCallback(() => cache.remove(url), [url]);
 
-  return {
-    data,
-    loading,
-    error,
-    reconnect,
-    clearCache
-  };
+  return { data, loading, error, reconnect, clearCache };
 }

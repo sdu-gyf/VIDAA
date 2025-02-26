@@ -46,6 +46,13 @@ async def run_workflow(url: str):
                             "error": json_data["data"]["error"],
                         }
                         yield data
+                    if json_data.get("__is_success", 1) == 0:
+                        data = {
+                            "status": "failed",
+                            "error": json_data["__error"],
+                        }
+                        print(data)
+                        yield data
 
 
 if __name__ == "__main__":
