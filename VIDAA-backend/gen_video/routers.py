@@ -4,6 +4,7 @@ from utils.vidaa_logger import gen_video_logger
 import json
 from .rss import get_rss_sources, BaseRSSContent
 from .workflows.dify import run_workflow
+from .images import get_image
 
 gen_video_router = APIRouter(prefix="/gen_video", tags=["gen_video"])
 
@@ -71,3 +72,8 @@ async def run_dify(url: str):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache, no-transform", "Connection": "keep-alive"},
     )
+
+
+@gen_video_router.get("/images")
+async def get_images(query: str, num: int, page: int):
+    return await get_image(query, num, page)

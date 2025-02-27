@@ -1,9 +1,10 @@
 import os
 import aiohttp
 import json
+from typing import AsyncGenerator
 
 
-def str_convert(s: str):
+def str_convert(s: str) -> str:
     assert s in ["node_started", "node_finished"]
     if s == "node_started":
         return "running"
@@ -11,7 +12,7 @@ def str_convert(s: str):
         return "completed"
 
 
-async def run_workflow(url: str):
+async def run_workflow(url: str) -> AsyncGenerator[dict, None]:
     headers = {
         "Authorization": f"Bearer {os.environ['VIDAA_DIFY_API_KEY']}",
         "Content-Type": "application/json",
@@ -51,7 +52,6 @@ async def run_workflow(url: str):
                             "status": "failed",
                             "error": json_data["__error"],
                         }
-                        print(data)
                         yield data
 
 

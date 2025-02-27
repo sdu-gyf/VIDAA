@@ -19,13 +19,13 @@ class AsyncSQLiteHandler:
         await self.cursor.execute(sql, params)
         await self.conn.commit()
 
-    async def insert_ollama_config(self, model_name: str, base_url: str):
+    async def insert_ollama_config(self, model_name: str, base_url: str) -> None:
         await self.execute(
             "INSERT INTO ollama_config (model_name, base_url) VALUES (?, ?)",
             (model_name, base_url),
         )
 
-    async def get_ollama_configs(self):
+    async def get_ollama_configs(self) -> list[dict]:
         await self.execute(
             "SELECT model_name, base_url FROM ollama_config where is_valid = 1"
         )
@@ -35,13 +35,13 @@ class AsyncSQLiteHandler:
 
     async def insert_article(
         self, title: str, url: str, from_rss_name: str, content: str
-    ):
+    ) -> None:
         await self.execute(
             "INSERT INTO article (title, url, from_rss_name, content) VALUES (?, ?, ?, ?)",
             (title, url, from_rss_name, content),
         )
 
-    async def get_articles(self, url: str):
+    async def get_articles(self, url: str) -> dict | None:
         await self.execute(
             "SELECT title, url, from_rss_name, content FROM article WHERE url = ?",
             (url,),
@@ -49,8 +49,33 @@ class AsyncSQLiteHandler:
         result = await self.cursor.fetchall()
         return result[0] if result else None
 
+    async def insert_pexels(
+        self, query_word: str, urls: str, page: int, per_page: int
+    ) -> None:
+        await self.execute(
+            "INSERT INTO pexels (query_word, urls, page, per_page) VALUES (?, ?, ?, ?)",
+            (query_word, urls, page, per_page),
+        )
 
-async def make_async_sqlite_handler():
+    async def get_pexels(
+        self, query_word: str, num: int, page: int
+    ) -> list[str] | None:
+        await self.execute(
+            "SELECT urls FROM pexels WHERE query_word = ?",
+            (query_word,),
+        )
+        datas = await self.cursor.fetchall()
+        if not datas:
+            return None
+        urls = ",".join(i[0] for i in datas).split(",")
+        try:
+            urls = list(set(urls))
+            return urls[(page - 1) * num : page * num]
+        except IndexError:
+            return None
+
+
+async def make_async_sqlite_handler() -> AsyncSQLiteHandler:
     return AsyncSQLiteHandler(os.getenv("VIDAA_DB_PATH"))
 
 
