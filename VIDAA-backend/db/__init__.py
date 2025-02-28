@@ -70,6 +70,8 @@ class AsyncSQLiteHandler:
         urls = ",".join(i[0] for i in datas).split(",")
         try:
             urls = list(set(urls))
+            if page * num > len(urls):
+                return None
             return urls[(page - 1) * num : page * num]
         except IndexError:
             return None

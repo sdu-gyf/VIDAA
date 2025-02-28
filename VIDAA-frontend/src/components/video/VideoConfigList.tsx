@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Article } from '../../types/article';
 import { Button } from '@heroui/react';
 import { getApiUrl } from '../../constants/api';
 import { useVideoConfig } from '../../contexts/VideoConfigContext';
 import { useClickAway } from 'react-use';
-import { useRef } from 'react';
 import { ErrorDisplay } from '../common/ErrorDisplay';
 
 interface VideoConfigListProps {
@@ -34,6 +33,30 @@ interface ArticleConfigs {
   [key: string]: ArticleConfig;
 }
 
+interface ImagePreviewProps {
+  keyword: string | null;
+  position: { x: number; y: number };
+}
+
+// 添加防抖函数
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function(...args: Parameters<T>) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => {
+      func(...args);
+      timeout = null;
+    }, wait);
+  };
+}
+
 export function VideoConfigList({ articles }: VideoConfigListProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { articleConfigs, setArticleConfigs } = useVideoConfig();
@@ -41,8 +64,21 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
   const [editingContext, setEditingContext] = useState<string | null>(null);
   const [editingTitleIndex, setEditingTitleIndex] = useState<{articleLink: string, index: number} | null>(null);
 
+  // Image preview states
+  const [previewKeyword, setPreviewKeyword] = useState<string | null>(null);
+  const [previewPosition, setPreviewPosition] = useState({ x: 0, y: 0 });
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+
   const contextRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+
+  const lastRequestedKeywordRef = useRef<string | null>(null);
+
+  const [isShowingPreview, setIsShowingPreview] = useState(false);
+
+  const mousePositionRef = useRef({ x: 0, y: 0 });
 
   useClickAway(contextRef, () => {
     if (editingContext !== null) {
@@ -251,8 +287,8 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
       return status.finalData.error;
     }
 
-    // Otherwise check for errors in the outputs
-    return status.finalData.outputs?.error || null;
+    // Otherwise check if there's an error in the outputs
+    return null;
   };
 
   const getStatusText = (article: Article) => {
@@ -299,6 +335,65 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
         )
       }
     }));
+  };
+
+  const handleKeywordHover = useCallback(
+    debounce(async (keyword: string, event: React.MouseEvent) => {
+      mousePositionRef.current = { x: event.clientX, y: event.clientY };
+      mousePositionRef.current = { x: event.clientX, y: event.clientY };
+
+      if (keyword === lastRequestedKeywordRef.current && previewImages.length > 0) {
+        setPreviewKeyword(keyword);
+        setPreviewPosition(mousePositionRef.current);
+        setIsShowingPreview(true);
+        return;
+      }
+
+      lastRequestedKeywordRef.current = keyword;
+      setPreviewKeyword(keyword);
+      setPreviewPosition(mousePositionRef.current);
+      setIsShowingPreview(true);
+      setIsLoadingImages(true);
+      setImageError(null);
+      setPreviewImages([]);
+
+      try {
+        const url = getApiUrl('IMAGES', {
+          query: keyword,
+          num: '3',
+          page: '1'
+        });
+        console.log(`Fetching images for keyword: ${keyword}`);
+        const response = await fetch(url);
+        const data = await response.json();
+
+        let imageUrls: string[] = [];
+
+        if (data.images && Array.isArray(data.images)) {
+          console.log("Found images array in response:", data.images);
+          imageUrls = data.images.filter(img => img && typeof img === 'string' && img.trim() !== '');
+        } else if (data.data && Array.isArray(data.data)) {
+          console.log("Found data array in response:", data.data);
+          imageUrls = data.data.filter(img => img && typeof img === 'string' && img.trim() !== '');
+        } else if (Array.isArray(data)) {
+          console.log("Response is directly an array:", data);
+          imageUrls = data.filter(img => img && typeof img === 'string' && img.trim() !== '');
+        }
+
+        console.log(`Found ${imageUrls.length} valid image URLs for keyword "${keyword}"`, imageUrls);
+        setPreviewImages(imageUrls);
+      } catch (error) {
+        console.error(`Error fetching images for keyword "${keyword}":`, error);
+        setImageError('Failed to load images');
+      } finally {
+        setIsLoadingImages(false);
+      }
+    }, 300),
+    [setPreviewKeyword, setPreviewPosition, setIsLoadingImages, setImageError, setPreviewImages, setIsShowingPreview]
+  );
+
+  const handleKeywordLeave = () => {
+    setIsShowingPreview(false);
   };
 
   return (
@@ -501,7 +596,18 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                             getFinalData(article)?.keywords?.map((keyword, index) => (
                               <span
                                 key={index}
-                                className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
+                                className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 cursor-pointer hover:bg-gray-200"
+                                onMouseEnter={(e) => {
+                                  // 如果没有显示预览，才触发hover处理
+                                  if (!isShowingPreview || lastRequestedKeywordRef.current !== keyword) {
+                                    handleKeywordHover(keyword, e);
+                                  } else {
+                                    // 只更新位置
+                                    mousePositionRef.current = { x: e.clientX, y: e.clientY };
+                                    setPreviewPosition(mousePositionRef.current);
+                                  }
+                                }}
+                                onMouseLeave={handleKeywordLeave}
                               >
                                 {keyword}
                               </span>
@@ -546,6 +652,47 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
           )}
         </div>
       ))}
+
+      {/* Image Preview Popup */}
+      {isShowingPreview && previewKeyword && (
+        <div
+          className="fixed bg-white rounded-lg shadow-lg border overflow-hidden z-50 pointer-events-none"
+          style={{
+            top: Math.max(10, previewPosition.y - 250),
+            left: previewPosition.x - 100,
+            maxWidth: '400px'
+          }}
+        >
+          <div className="p-2 bg-gray-50 border-b">
+            <span className="font-medium text-sm text-gray-700">{previewKeyword}</span>
+          </div>
+          <div className="p-3">
+            {isLoadingImages ? (
+              <div className="flex justify-center items-center py-4">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              </div>
+            ) : imageError ? (
+              <div className="text-red-500 text-sm py-2">{imageError}</div>
+            ) : previewImages.length === 0 ? (
+              <div className="text-gray-500 text-sm py-2">No images found</div>
+            ) : (
+              <div className="flex flex-row gap-2 overflow-x-auto">
+                {previewImages.map((image, idx) => (
+                  <img
+                    key={idx}
+                    src={image}
+                    alt={`${previewKeyword} ${idx+1}`}
+                    className="h-[120px] w-auto rounded object-cover flex-shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Image+Load+Error';
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
