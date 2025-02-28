@@ -41,9 +41,14 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
 
 ### Front-End Capabilities
 
-- [x] Manage and modify RSS feeds
-- [ ] Adjust model prompt settings
-- [ ] Provide a user-friendly interface for each step of video creation
+- [x] RSS feed display
+- [ ] user-friendly interface for each step of video creation
+  - [x] theme selection
+  - [x] copywriting generation
+  - [x] audio generation
+  - [x] subtitle generation
+  - [x] image fetching
+  - [ ] video packaging
 - [ ] Unified management of login status across video platforms
 - [ ] Real-time display of video publishing status
 - [ ] Display historical video information
