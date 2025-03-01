@@ -6,3 +6,11 @@ vidaa.db
 node_modules/
 diff.txt
 .env
+*.mp4
+*.mp3
+*.wav
+*.srt
+*.jpg
+*.png
+*.jpeg
+*.gif

@@ -1,7 +1,8 @@
-from llm_interface import LLMBase
+from typing import Optional
 
 from ollama import AsyncClient
-from typing import Optional
+
+from .llm_interface import LLMBase
 
 
 class OllamaImpl(LLMBase):

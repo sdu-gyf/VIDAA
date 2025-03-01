@@ -1,7 +1,8 @@
 import os
-import aiohttp
 import json
 from typing import AsyncGenerator
+
+import aiohttp
 
 
 def str_convert(s: str) -> str:

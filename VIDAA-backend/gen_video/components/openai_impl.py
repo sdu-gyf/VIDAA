@@ -1,7 +1,8 @@
-from llm_interface import LLMBase
+from typing import Optional
 
 from openai import AsyncOpenAI
-from typing import Optional
+
+from .llm_interface import LLMBase
 
 
 class OpenAIImpl(LLMBase):

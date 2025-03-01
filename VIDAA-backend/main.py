@@ -1,11 +1,14 @@
+from dotenv import load_dotenv
+import os
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
+
 from gen_video import gen_video_router
 from uploaders import uploaders_router
-from dotenv import load_dotenv
-import os
+
 
 load_dotenv()
 assert os.path.exists(os.getenv("VIDAA_DB_PATH")), "VIDAA_DB_PATH does not exist"

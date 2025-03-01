@@ -2,8 +2,6 @@
 
 VIDAA is a React-based web application that transforms articles into engaging videos automatically. This platform uses AI technology to analyze articles from RSS feeds and generate video content with appropriate titles, scripts, and visuals.
 
-![VIDAA Application](https://placeholder-image-url.com/vidaa-screenshot.png)
-
 ## Features
 
 - **RSS Integration**: Connect to various RSS sources to access articles for video generation
@@ -23,6 +21,7 @@ VIDAA is a React-based web application that transforms articles into engaging vi
 
 ## Project Structure
 
+```
 src/
 ├── components/              # Reusable UI components
 │   ├── article/             # Article-related components
@@ -37,6 +36,7 @@ src/
 ├── services/                # Service layers for API interaction
 ├── styles/                  # CSS stylesheets
 └── types/                   # TypeScript type definitions
+```
 
 ## Getting Started
 

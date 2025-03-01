@@ -32,7 +32,8 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
   - [x] Copywriting generation
   - [x] Audio and subtitle file creation
   - [x] Image fetching (using [pexels](https://pexels.com))
-  - [ ] Video packaging
+  - [x] Video packaging
+  - [ ] Video copyright addition
 - **Video Distribution**
   - [ ] Douyin
   - [ ] Xiaohongshu
@@ -49,6 +50,7 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
   - [x] subtitle generation
   - [x] image fetching
   - [ ] video packaging
+  - [ ] video copyright addition
 - [ ] Unified management of login status across video platforms
 - [ ] Real-time display of video publishing status
 - [ ] Display historical video information

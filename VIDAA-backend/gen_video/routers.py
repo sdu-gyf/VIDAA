@@ -1,10 +1,15 @@
+import json
+
+
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from utils.vidaa_logger import gen_video_logger
-import json
+
+
 from .rss import get_rss_sources, BaseRSSContent
 from .workflows.dify import run_workflow
 from .images import get_image
+from .pack_video.pack_video import pack_video_with_all_resources, pack_video_for_test
+from utils.vidaa_logger import gen_video_logger
 
 gen_video_router = APIRouter(prefix="/gen_video", tags=["gen_video"])
 
@@ -77,3 +82,8 @@ async def run_dify(url: str):
 @gen_video_router.get("/images")
 async def get_images(query: str, num: int, page: int):
     return await get_image(query, num, page)
+
+
+@gen_video_router.get("/pack_video_test")
+async def pack_video():
+    return await pack_video_for_test()

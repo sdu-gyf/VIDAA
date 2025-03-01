@@ -1,5 +1,7 @@
 import asyncio
 from typing import AsyncGenerator
+
+
 import edge_tts
 import pysrt
 
@@ -7,7 +9,6 @@ import pysrt
 def merge_subtitles(
     subs: list[pysrt.SubRipItem], full_text_with_punctuation: str
 ) -> str:
-
     # Get original text from srt (without punctuation)
     original_text = "".join(sub.text for sub in subs)
 
@@ -28,6 +29,8 @@ def merge_subtitles(
     current_start = None
     current_text = ""
     char_count = 0
+    char_count_since_last_split = 0
+    MAX_CHARS_PER_SUBTITLE = 10  # Maximum characters per subtitle
 
     for sub in subs:
         if current_start is None:
@@ -35,18 +38,24 @@ def merge_subtitles(
 
         current_text += sub.text
         char_count += len(sub.text)
+        char_count_since_last_split += len(sub.text)
 
-        # Check if we should split here
-        if char_count - 1 in punctuation_positions:
+        # Check if we should split here due to punctuation
+        should_split = char_count - 1 in punctuation_positions
+        # Check if we should split due to length
+        should_split_length = char_count_since_last_split >= MAX_CHARS_PER_SUBTITLE
+
+        if should_split or should_split_length:
             new_sub = pysrt.SubRipItem(
                 index=len(merged_subs) + 1,
                 start=current_start,
                 end=sub.end,
-                text=current_text,  # Remove the punctuation here
+                text=current_text,
             )
             merged_subs.append(new_sub)
             current_text = ""
             current_start = None
+            char_count_since_last_split = 0
 
     # Handle any remaining text
     if current_text:
@@ -67,6 +76,7 @@ def merge_subtitles(
 
 
 async def tts_and_get_srt(text: str, voice: str) -> AsyncGenerator[dict, None]:
+    # TODO: expose the interface to preview audio and subtitles directly to the frontend
     communicate = edge_tts.Communicate(text, voice)
     submaker = edge_tts.SubMaker()
     async for chunk in communicate.stream():

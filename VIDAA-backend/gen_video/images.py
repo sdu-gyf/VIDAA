@@ -1,8 +1,10 @@
 import os
-import aiohttp
 import asyncio
-from db import make_async_sqlite_handler
+
+import aiohttp
 from googletrans import Translator
+
+from db import make_async_sqlite_handler
 
 
 async def get_image(query: str, num: int = 3, page: int = 1) -> list[str] | None:
@@ -29,7 +31,7 @@ if __name__ == "__main__":
     import asyncio
 
     async def main():
-        data = await get_image("cat")
+        data = await get_image("cat", 50, 1)
         import pprint
 
         pprint.pprint(data)

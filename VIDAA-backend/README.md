@@ -1,4 +1,4 @@
-VIDAA-backend
+# VIDAA-backend
 
 ## 运行项目
 
@@ -51,6 +51,11 @@ playwright codegen --ignore-https-errors --target python -o open_baidu.py -b chr
 ```
 如果一直无法发送网络请求，则需要配置代理
 
+### 安装ffmpeg
+
+```bash
+sudo apt-get install ffmpeg
+```
 
 ### 运行项目
 

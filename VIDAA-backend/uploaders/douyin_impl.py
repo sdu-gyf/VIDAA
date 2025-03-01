@@ -1,7 +1,9 @@
-from uploader_interface import UploaderInterface
-from playwright.async_api import async_playwright
 import os
 from pathlib import Path
+
+from playwright.async_api import async_playwright
+
+from .uploader_interface import UploaderInterface
 
 
 class DouyinUploader(UploaderInterface):
