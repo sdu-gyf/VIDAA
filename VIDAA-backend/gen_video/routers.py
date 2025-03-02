@@ -2,7 +2,8 @@ import json
 
 
 from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from pydantic import BaseModel
 
 
 from .rss import get_rss_sources, BaseRSSContent
@@ -87,3 +88,25 @@ async def get_images(query: str, num: int, page: int):
 @gen_video_router.get("/pack_video_test")
 async def pack_video():
     return await pack_video_for_test()
+
+
+class VideoInfo(BaseModel):
+    article: str
+    images: list[str]
+
+
+@gen_video_router.post("/pack_video")
+async def pack_video(video_info: VideoInfo):
+    data = await pack_video_with_all_resources(video_info.article, video_info.images)
+    gen_video_logger.info("pack video done")
+
+    async def content_generator():
+        chunk_size = 1024 * 1024  # 1MB
+        for i in range(0, len(data), chunk_size):
+            yield data[i : i + chunk_size]
+
+    return StreamingResponse(
+        content_generator(),
+        media_type="video/mp4",
+        headers={"Content-Disposition": "attachment; filename=video.mp4"},
+    )

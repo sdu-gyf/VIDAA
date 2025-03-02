@@ -92,15 +92,6 @@ export function GenVideoPage() {
               </h2>
               <VideoConfigList articles={selectedArticles} />
             </div>
-            <div className="flex justify-end">
-              <Button
-                color="primary"
-                size="lg"
-                className="rounded-full px-8"
-              >
-                Generate Video
-              </Button>
-            </div>
           </div>
         )
       default:

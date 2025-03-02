@@ -10,6 +10,7 @@ import aiohttp
 
 from .test_case import background_image_key_list, ARTICLE
 from ..tts import tts_and_get_srt
+from utils.vidaa_logger import gen_video_logger
 
 
 async def get_audio_duration(audio_bytes: bytes) -> float:
@@ -100,6 +101,7 @@ async def pack_video_with_all_resources(
         silent_video_process.stdin.close()
 
         silent_video_process.wait()
+        gen_video_logger.info("silent video process done")
 
         if silent_video_process.returncode != 0:
             raise Exception("silent video process failed")
@@ -118,6 +120,7 @@ async def pack_video_with_all_resources(
 
         stderr = fps_conversion_process.stderr.read()
         fps_conversion_process.wait()
+        gen_video_logger.info("fps conversion process done")
 
         if fps_conversion_process.returncode != 0:
             raise Exception("fps conversion failed")
@@ -137,7 +140,7 @@ async def pack_video_with_all_resources(
 
         stderr = final_video_process.stderr.read()
         final_video_process.wait()
-
+        gen_video_logger.info("final video process done")
         if final_video_process.returncode != 0:
             raise Exception("audio addition failed")
 

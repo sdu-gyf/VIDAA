@@ -49,7 +49,7 @@ This project adopts a decoupled front-end and back-end architecture. Please refe
   - [x] audio generation
   - [x] subtitle generation
   - [x] image fetching
-  - [ ] video packaging
+  - [x] video packaging
   - [ ] video copyright addition
 - [ ] Unified management of login status across video platforms
 - [ ] Real-time display of video publishing status
