@@ -1,5 +1,6 @@
 import json
-
+import zipfile
+from io import BytesIO
 
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse, FileResponse
@@ -10,6 +11,7 @@ from .rss import get_rss_sources, BaseRSSContent
 from .workflows.dify import run_workflow
 from .images import get_image
 from .pack_video.pack_video import pack_video_with_all_resources, pack_video_for_test
+from .tts import tts_and_get_srt
 from utils.vidaa_logger import gen_video_logger
 
 gen_video_router = APIRouter(prefix="/gen_video", tags=["gen_video"])
@@ -109,4 +111,37 @@ async def pack_video(video_info: VideoInfo):
         content_generator(),
         media_type="video/mp4",
         headers={"Content-Disposition": "attachment; filename=video.mp4"},
+    )
+
+
+class TTSInfo(BaseModel):
+    text: str
+    voice: str | None = "zh-CN-XiaoxiaoNeural"
+    filename: str | None = "tts"
+
+
+@gen_video_router.post("/tts")
+async def tts(tts_info: TTSInfo):
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        audio_buffer = BytesIO()
+        async for chunk in tts_and_get_srt(tts_info.text, tts_info.voice):
+            if chunk["type"] == "audio":
+                audio_buffer.write(chunk["data"])
+            elif chunk["type"] == "srt":
+                zip_file.writestr(f"{tts_info.filename}.srt", chunk["data"])
+        zip_file.writestr(f"{tts_info.filename}.mp3", audio_buffer.getvalue())
+    zip_data = zip_buffer.getvalue()
+
+    async def content_generator():
+        chunk_size = 1024 * 1024  # 1MB
+        for i in range(0, len(zip_data), chunk_size):
+            yield zip_data[i : i + chunk_size]
+
+    return StreamingResponse(
+        content_generator(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename={tts_info.filename}.zip"
+        },
     )
