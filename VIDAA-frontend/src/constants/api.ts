@@ -5,6 +5,7 @@ export const API_PATHS = {
   DIFY: '/gen_video/dify',
   IMAGES: '/gen_video/images',
   PACK_VIDEO: '/gen_video/pack_video',
+  GEN_VIDEO_TTS: '/gen_video/tts',
 } as const;
 
 export const getApiUrl = (path: keyof typeof API_PATHS, params?: Record<string, string>) => {

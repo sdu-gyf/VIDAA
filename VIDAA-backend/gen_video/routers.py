@@ -1,7 +1,7 @@
 import json
 import zipfile
 from io import BytesIO
-
+from urllib.parse import quote
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel
@@ -123,6 +123,7 @@ class TTSInfo(BaseModel):
 @gen_video_router.post("/tts")
 async def tts(tts_info: TTSInfo):
     zip_buffer = BytesIO()
+    filename = quote(tts_info.filename)
     with zipfile.ZipFile(zip_buffer, "w") as zip_file:
         audio_buffer = BytesIO()
         async for chunk in tts_and_get_srt(tts_info.text, tts_info.voice):
@@ -141,7 +142,5 @@ async def tts(tts_info: TTSInfo):
     return StreamingResponse(
         content_generator(),
         media_type="application/zip",
-        headers={
-            "Content-Disposition": f"attachment; filename={tts_info.filename}.zip"
-        },
+        headers={"Content-Disposition": f"attachment; filename={filename}.zip"},
     )

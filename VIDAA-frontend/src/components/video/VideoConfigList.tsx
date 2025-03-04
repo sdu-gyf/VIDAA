@@ -735,6 +735,59 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
     }
   };
 
+  // Add TTS function before the return statement
+  const handleTTS = async (article: Article) => {
+    if (!article || !article.link) return;
+
+    // Get the article script content
+    const articleContent = getFinalData(article)?.context;
+    const firstTitle = getFinalData(article)?.title_list?.[0];
+
+    if (!articleContent) {
+      setVideoGenerationError(prev => ({
+        ...prev,
+        [article.link]: "No article content available"
+      }));
+      return;
+    }
+
+    try {
+      const apiUrl = getApiUrl('GEN_VIDEO_TTS');
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: articleContent,
+          filename: firstTitle || 'tts'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate TTS');
+      }
+
+      // Create a blob from the response and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${firstTitle || 'tts'}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Error generating TTS:', error);
+      setVideoGenerationError(prev => ({
+        ...prev,
+        [article.link]: "Failed to generate TTS"
+      }));
+    }
+  };
+
   return (
     <div className="space-y-4">
       {articles.map((article, index) => (
@@ -874,68 +927,74 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                         </div>
                       )}
 
-                      {getFinalData(article)?.title_list?.length > 0 && (
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-gray-700">待选标题</h4>
-                          <div ref={titleRef} className="space-y-2">
-                            {getFinalData(article)?.title_list?.map((title, index) => (
-                              <div
-                                key={index}
-                                className={`group flex items-center justify-between p-3 rounded-lg text-gray-600 cursor-pointer transition-colors ${
-                                  title === getSelectedTitle(article)
-                                    ? 'bg-blue-50 border-2 border-blue-500'
-                                    : 'bg-gray-50 hover:bg-gray-100'
-                                }`}
-                              >
-                                {editingTitleIndex?.articleLink === article.link &&
-                                 editingTitleIndex.index === index ? (
-                                  <input
-                                    className="flex-1 bg-transparent border-none focus:ring-0 text-gray-600"
-                                    value={title}
-                                    onChange={(e) => {
-                                      const newTitles = [...(getFinalData(article)?.title_list || [])];
-                                      newTitles[index] = e.target.value;
-                                      setArticleConfigs(prev => ({
-                                        ...prev,
-                                        [article.link]: {
-                                          ...prev[article.link],
-                                          data: prev[article.link].data.map(d =>
-                                            d.status === 'succeeded' ? {
-                                              ...d,
-                                              outputs: { ...d.outputs, title_list: newTitles }
-                                            } : d
-                                          )
-                                        }
-                                      }));
-                                    }}
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <>
-                                    <div
-                                      className="flex-1"
-                                      onClick={() => handleTitleSelect(article, title)}
-                                    >
-                                      {title}
-                                    </div>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditingTitleIndex({ articleLink: article.link, index });
+                      {/* Title List */}
+                      {(() => {
+                        const titleList = getFinalData(article)?.title_list;
+                        if (!titleList || titleList.length === 0) return null;
+
+                        return (
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-gray-700">待选标题</h4>
+                            <div ref={titleRef} className="space-y-2">
+                              {titleList.map((title, index) => (
+                                <div
+                                  key={index}
+                                  className={`group flex items-center justify-between p-3 rounded-lg text-gray-600 cursor-pointer transition-colors ${
+                                    title === getSelectedTitle(article)
+                                      ? 'bg-blue-50 border-2 border-blue-500'
+                                      : 'bg-gray-50 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  {editingTitleIndex?.articleLink === article.link &&
+                                   editingTitleIndex.index === index ? (
+                                    <input
+                                      className="flex-1 bg-transparent border-none focus:ring-0 text-gray-600"
+                                      value={title}
+                                      onChange={(e) => {
+                                        const newTitles = [...titleList];
+                                        newTitles[index] = e.target.value;
+                                        setArticleConfigs(prev => ({
+                                          ...prev,
+                                          [article.link]: {
+                                            ...prev[article.link],
+                                            data: prev[article.link].data.map(d =>
+                                              d.status === 'succeeded' ? {
+                                                ...d,
+                                                outputs: { ...d.outputs, title_list: newTitles }
+                                              } : d
+                                            )
+                                          }
+                                        }));
                                       }}
-                                      className="opacity-0 group-hover:opacity-100 ml-2 p-1 hover:bg-gray-200 rounded transition-opacity"
-                                    >
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                      </svg>
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            ))}
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    <>
+                                      <div
+                                        className="flex-1"
+                                        onClick={() => handleTitleSelect(article, title)}
+                                      >
+                                        {title}
+                                      </div>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingTitleIndex({ articleLink: article.link, index });
+                                        }}
+                                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 hover:bg-gray-200 rounded transition-opacity"
+                                      >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                        </svg>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       <div className="space-y-2">
                         <h4 className="font-medium text-gray-700">背景图关键字</h4>
@@ -1065,31 +1124,6 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                     </div>
                   )}
 
-                  {((getArticleStatus(article)?.hasError) &&
-                    (getFinalError(article) || articleConfigs[article.link]?.error)) ? (
-                    <>
-                      {console.log('Error to display:', getFinalError(article) || articleConfigs[article.link]?.error)}
-                      <ErrorDisplay
-                        message={getFinalError(article) || articleConfigs[article.link]?.error || 'Unknown error occurred'}
-                        onRetry={() => handleGetConfig(article)}
-                        title="处理失败"
-                      />
-                    </>
-                  ) : null}
-
-                  {!getArticleStatus(article)?.finalData && (
-                    <div className="text-center text-gray-500 py-8">
-                      {getArticleStatus(article)?.loading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                          <span>Processing...</span>
-                        </div>
-                      ) : (
-                        'Click "Get Config" to start processing'
-                      )}
-                    </div>
-                  )}
-
                   {/* Generate Video Button */}
                   {getArticleStatus(article)?.finalData && !getArticleStatus(article)?.loading && (
                     <div className="mt-4 flex flex-col items-center">
@@ -1155,18 +1189,39 @@ export function VideoConfigList({ articles }: VideoConfigListProps) {
                           </Button>
                         </div>
                       ) : (
-                        <Button
-                          color="primary"
-                          size="lg"
-                          onClick={() => handleGenerateVideo(article)}
-                          className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md"
-                          isDisabled={!imagePool[article.link] || imagePool[article.link].length === 0}
-                        >
-                          {!imagePool[article.link] || imagePool[article.link].length === 0
-                            ? "Add images first"
-                            : "Generate Video"}
-                        </Button>
+                        <div className="flex gap-4">
+                          <Button
+                            color="primary"
+                            size="lg"
+                            onClick={() => handleTTS(article)}
+                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md"
+                          >
+                            Generate TTS
+                          </Button>
+                          <Button
+                            color="primary"
+                            size="lg"
+                            onClick={() => handleGenerateVideo(article)}
+                            className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md"
+                            isDisabled={!imagePool[article.link] || imagePool[article.link]?.length === 0}
+                          >
+                            {!imagePool[article.link] || imagePool[article.link]?.length === 0
+                              ? "Add images first"
+                              : "Generate Video"}
+                          </Button>
+                        </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* Error Display */}
+                  {getArticleStatus(article)?.hasError && (getFinalError(article) || articleConfigs[article.link]?.error) && (
+                    <div>
+                      <ErrorDisplay
+                        message={getFinalError(article) || articleConfigs[article.link]?.error || 'Unknown error occurred'}
+                        onRetry={() => handleGetConfig(article)}
+                        title="处理失败"
+                      />
                     </div>
                   )}
                 </div>
