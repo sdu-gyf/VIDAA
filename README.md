@@ -69,3 +69,12 @@ VIDAA是一个一站式视频制作分发平台，通过大模型的能力制作
 - [lishang520/DouYin-Auto-Upload](https://github.com/lishang520/DouYin-Auto-Upload)
 - [kebenxiaoming/matrix](https://github.com/kebenxiaoming/matrix)
 - [biliup/biliup-rs](https://github.com/biliup/biliup-rs)
+
+## Release Note
+
+### v0.5.0 2025-03-05
+
+- 支持获取文章
+- 支持生成口播稿和候选标题
+- 支持音频和字幕文件生成
+- 支持视频打包

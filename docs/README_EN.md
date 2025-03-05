@@ -65,3 +65,12 @@ The video upload functionality is inspired by the following projects, thank you 
 - [lishang520/DouYin-Auto-Upload](https://github.com/lishang520/DouYin-Auto-Upload)
 - [kebenxiaoming/matrix](https://github.com/kebenxiaoming/matrix)
 - [biliup/biliup-rs](https://github.com/biliup/biliup-rs)
+
+## Release Note
+
+### v0.5.0 2025-03-05
+
+- Support article retrieval
+- Support generating oral scripts and candidate titles
+- Support audio and subtitle file generation
+- Support video packaging
